@@ -14,6 +14,10 @@ module HubKernel
       end
     end
 
+    teardown do
+      ExampleEvents.instance_variable_set(:@handlers, nil)
+    end
+
     test "declared events are derived from the vocabulary methods" do
       assert_equal [ :lead_generated ], ExampleEvents.declared_events
     end
@@ -25,6 +29,12 @@ module HubKernel
       ExampleEvents.lead_generated(prospect_id: 42)
 
       assert_equal 42, received.prospect_id
+    end
+
+    test "wiring an undeclared event name raises" do
+      assert_raises(HubKernel::UndeclaredEventError) do
+        ExampleEvents.on(:not_a_thing) {}
+      end
     end
   end
 end
