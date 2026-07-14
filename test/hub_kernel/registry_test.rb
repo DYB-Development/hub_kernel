@@ -10,5 +10,11 @@ module HubKernel
 
       assert_same adapter, registry.resolve(:context)
     end
+
+    test "resolve raises UnboundPortError for a port with no adapter" do
+      registry = Registry.new
+
+      assert_raises(UnboundPortError) { registry.resolve(:context) }
+    end
   end
 end

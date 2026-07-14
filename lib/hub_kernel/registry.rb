@@ -1,4 +1,6 @@
 module HubKernel
+  class UnboundPortError < StandardError; end
+
   class Registry
     def initialize
       @adapters = {}
@@ -9,7 +11,9 @@ module HubKernel
     end
 
     def resolve(port)
-      @adapters.fetch(port)
+      @adapters.fetch(port) do
+        raise UnboundPortError, "no adapter bound for required port :#{port}"
+      end
     end
   end
 end
