@@ -52,5 +52,11 @@ module HubKernel
 
       assert_match(/lead_generated/, error.message)
     end
+
+    test "verify_wired! raises when a declared event has no handler" do
+      assert_raises(HubKernel::UnwiredEventError) do
+        ExampleEvents.verify_wired!
+      end
+    end
   end
 end

@@ -1,5 +1,6 @@
 module HubKernel
   class UndeclaredEventError < StandardError; end
+  class UnwiredEventError < StandardError; end
 
   module Events
     def declared_events
@@ -14,6 +15,10 @@ module HubKernel
 
     def emit(name, payload)
       handlers[name].each { |handler| handler.call(payload) }
+    end
+
+    def verify_wired!
+      raise UnwiredEventError
     end
 
     private
