@@ -66,5 +66,11 @@ module HubKernel
 
       assert_match(/lead_generated/, error.message)
     end
+
+    test "verify_wired! passes when every declared event has a handler" do
+      ExampleEvents.on(:lead_generated) {}
+
+      assert_nothing_raised { ExampleEvents.verify_wired! }
+    end
   end
 end

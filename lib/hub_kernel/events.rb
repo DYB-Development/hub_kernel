@@ -18,6 +18,8 @@ module HubKernel
     end
 
     def verify_wired!
+      return if unwired_events.empty?
+
       raise UnwiredEventError, "unwired events: #{unwired_events}"
     end
 
