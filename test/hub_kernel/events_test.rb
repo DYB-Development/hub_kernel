@@ -31,6 +31,16 @@ module HubKernel
       assert_equal 42, received.prospect_id
     end
 
+    test "multiple handlers on one event fire in wiring order" do
+      order = []
+      ExampleEvents.on(:lead_generated) { order << :first }
+      ExampleEvents.on(:lead_generated) { order << :second }
+
+      ExampleEvents.lead_generated(prospect_id: 1)
+
+      assert_equal [ :first, :second ], order
+    end
+
     test "wiring an undeclared event name raises" do
       assert_raises(HubKernel::UndeclaredEventError) do
         ExampleEvents.on(:not_a_thing) {}
