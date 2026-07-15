@@ -36,5 +36,13 @@ module HubKernel
         ExampleEvents.on(:not_a_thing) {}
       end
     end
+
+    test "the undeclared-event error names the offending symbol" do
+      error = assert_raises(HubKernel::UndeclaredEventError) do
+        ExampleEvents.on(:not_a_thing) {}
+      end
+
+      assert_match(/not_a_thing/, error.message)
+    end
   end
 end

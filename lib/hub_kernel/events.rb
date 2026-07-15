@@ -7,7 +7,7 @@ module HubKernel
     end
 
     def on(name, &handler)
-      raise UndeclaredEventError unless declared_events.include?(name)
+      raise UndeclaredEventError, "undeclared event :#{name}" unless declared_events.include?(name)
 
       handlers[name] << handler
     end
