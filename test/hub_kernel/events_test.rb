@@ -14,8 +14,20 @@ module HubKernel
       end
     end
 
+    module OtherEvents
+      extend HubKernel::Events
+      extend self
+
+      LeadGenerated = Data.define(:prospect_id)
+
+      def lead_generated(prospect_id:)
+        emit(:lead_generated, LeadGenerated.new(prospect_id: prospect_id))
+      end
+    end
+
     teardown do
       ExampleEvents.instance_variable_set(:@handlers, nil)
+      OtherEvents.instance_variable_set(:@handlers, nil)
     end
 
     test "declared events are derived from the vocabulary methods" do
@@ -81,6 +93,15 @@ module HubKernel
       ExampleEvents.on(:lead_generated) {}
 
       assert_nothing_raised { ExampleEvents.verify_wired! }
+    end
+
+    test "each hub keeps an isolated handler table" do
+      other_ran = false
+      OtherEvents.on(:lead_generated) { other_ran = true }
+
+      ExampleEvents.lead_generated(prospect_id: 1)
+
+      refute other_ran
     end
   end
 end
