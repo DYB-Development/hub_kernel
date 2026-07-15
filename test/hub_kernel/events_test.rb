@@ -55,13 +55,13 @@ module HubKernel
 
     test "wiring an undeclared event name raises" do
       assert_raises(HubKernel::UndeclaredEventError) do
-        ExampleEvents.on(:not_a_thing) {}
+        ExampleEvents.on(:not_a_thing) { }
       end
     end
 
     test "the undeclared-event error names the offending symbol" do
       error = assert_raises(HubKernel::UndeclaredEventError) do
-        ExampleEvents.on(:not_a_thing) {}
+        ExampleEvents.on(:not_a_thing) { }
       end
 
       assert_match(/not_a_thing/, error.message)
@@ -69,7 +69,7 @@ module HubKernel
 
     test "the undeclared-event error lists the declared events" do
       error = assert_raises(HubKernel::UndeclaredEventError) do
-        ExampleEvents.on(:not_a_thing) {}
+        ExampleEvents.on(:not_a_thing) { }
       end
 
       assert_match(/lead_generated/, error.message)
@@ -90,7 +90,7 @@ module HubKernel
     end
 
     test "verify_wired! passes when every declared event has a handler" do
-      ExampleEvents.on(:lead_generated) {}
+      ExampleEvents.on(:lead_generated) { }
 
       assert_nothing_raised { ExampleEvents.verify_wired! }
     end
