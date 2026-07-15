@@ -58,5 +58,13 @@ module HubKernel
         ExampleEvents.verify_wired!
       end
     end
+
+    test "the unwired-event error names every unwired event" do
+      error = assert_raises(HubKernel::UnwiredEventError) do
+        ExampleEvents.verify_wired!
+      end
+
+      assert_match(/lead_generated/, error.message)
+    end
   end
 end

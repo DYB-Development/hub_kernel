@@ -18,10 +18,14 @@ module HubKernel
     end
 
     def verify_wired!
-      raise UnwiredEventError
+      raise UnwiredEventError, "unwired events: #{unwired_events}"
     end
 
     private
+
+    def unwired_events
+      declared_events.reject { |name| handlers[name].any? }
+    end
 
     def handlers
       @handlers ||= Hash.new { |table, name| table[name] = [] }
