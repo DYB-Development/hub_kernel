@@ -44,5 +44,13 @@ module HubKernel
 
       assert_match(/not_a_thing/, error.message)
     end
+
+    test "the undeclared-event error lists the declared events" do
+      error = assert_raises(HubKernel::UndeclaredEventError) do
+        ExampleEvents.on(:not_a_thing) {}
+      end
+
+      assert_match(/lead_generated/, error.message)
+    end
   end
 end
