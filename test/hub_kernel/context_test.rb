@@ -24,5 +24,11 @@ module HubKernel
 
       assert_equal :null_actor, hub.context.actor
     end
+
+    test "constructing a hub without a context fails at construction" do
+      error = assert_raises(ArgumentError) { ExampleHub.new }
+
+      assert_match(/:context/, error.message)
+    end
   end
 end
