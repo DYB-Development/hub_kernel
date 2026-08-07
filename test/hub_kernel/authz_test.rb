@@ -30,5 +30,11 @@ module HubKernel
 
       assert_equal true, hub.allowed?(:actor, "campaigns:send")
     end
+
+    test "the hub returns the policy's negative answer" do
+      hub = ExampleHub.new(authz: FixedAnswerPolicy.new(false))
+
+      assert_equal false, hub.allowed?(:actor, "campaigns:send")
+    end
   end
 end
