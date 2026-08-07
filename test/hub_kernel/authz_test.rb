@@ -50,5 +50,11 @@ module HubKernel
 
       assert_match(/allowed\? must return true or false/, error.message)
     end
+
+    test "constructing a hub without an authz policy fails at construction" do
+      error = assert_raises(ArgumentError) { ExampleHub.new }
+
+      assert_match(/:authz/, error.message)
+    end
   end
 end
