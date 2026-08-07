@@ -16,6 +16,8 @@ module HubKernel
     class ExampleHub
       include HubKernel::Authz
 
+      gates "campaigns:send"
+
       def initialize(authz:)
         @authz = authz
       end
@@ -55,6 +57,10 @@ module HubKernel
       error = assert_raises(ArgumentError) { ExampleHub.new }
 
       assert_match(/:authz/, error.message)
+    end
+
+    test "the hub declares the actions it gates" do
+      assert_equal [ "campaigns:send" ], ExampleHub.gated_actions
     end
   end
 end
