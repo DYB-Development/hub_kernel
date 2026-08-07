@@ -36,5 +36,11 @@ module HubKernel
 
       assert_equal false, hub.allowed?(:actor, "campaigns:send")
     end
+
+    test "a truthy-ish answer from the policy raises" do
+      hub = ExampleHub.new(authz: FixedAnswerPolicy.new("yes"))
+
+      assert_raises(HubKernel::NonBooleanAnswerError) { hub.allowed?(:actor, "campaigns:send") }
+    end
   end
 end

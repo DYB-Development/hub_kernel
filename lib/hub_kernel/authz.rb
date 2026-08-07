@@ -1,7 +1,12 @@
 module HubKernel
+  class NonBooleanAnswerError < StandardError; end
+
   module Authz
     def allowed?(actor, action)
-      authz.allowed?(actor, action)
+      answer = authz.allowed?(actor, action)
+      raise NonBooleanAnswerError unless [ true, false ].include?(answer)
+
+      answer
     end
   end
 end
