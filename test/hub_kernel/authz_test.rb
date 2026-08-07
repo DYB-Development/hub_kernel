@@ -42,5 +42,13 @@ module HubKernel
 
       assert_raises(HubKernel::NonBooleanAnswerError) { hub.allowed?(:actor, "campaigns:send") }
     end
+
+    test "the non-boolean-answer error states that allowed? must return true or false" do
+      hub = ExampleHub.new(authz: FixedAnswerPolicy.new("yes"))
+
+      error = assert_raises(HubKernel::NonBooleanAnswerError) { hub.allowed?(:actor, "campaigns:send") }
+
+      assert_match(/allowed\? must return true or false/, error.message)
+    end
   end
 end
