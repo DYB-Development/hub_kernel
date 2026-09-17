@@ -12,5 +12,29 @@ module HubKernel
 
       assert_equal :a_person, action.person
     end
+
+    test "an action refuses to be built without the person" do
+      error = assert_raises(ArgumentError) do
+        ExampleAction.new(account: :an_account, values: {})
+      end
+
+      assert_match(/person/, error.message)
+    end
+
+    test "an action refuses to be built without the account" do
+      error = assert_raises(ArgumentError) do
+        ExampleAction.new(person: :a_person, values: {})
+      end
+
+      assert_match(/account/, error.message)
+    end
+
+    test "an action refuses to be built without the values" do
+      error = assert_raises(ArgumentError) do
+        ExampleAction.new(person: :a_person, account: :an_account)
+      end
+
+      assert_match(/values/, error.message)
+    end
   end
 end
