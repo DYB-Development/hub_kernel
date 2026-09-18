@@ -32,9 +32,11 @@ module HubKernel
         end
 
         test "a refused answer carries the reason" do
-          answer = the_saving_object.new(person: a_person, account: an_account, values: values_it_refuses).call
+          the_saving_objects.each_value do |object|
+            answer = object.new(person: a_person, account: an_account, values: values_it_refuses).call
 
-          assert_not_empty answer.message.to_s, "#{the_saving_object} must say why it refused"
+            assert_not_empty answer.message.to_s, "#{object} must say why it refused"
+          end
         end
       end
     end
