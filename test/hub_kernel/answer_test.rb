@@ -34,5 +34,9 @@ module HubKernel
     test "an answer that was not kept carries the reason" do
       assert_equal "That colour is not one of the ones on offer", HubKernel::Answer.met!(Refused.new).message
     end
+
+    test "an answer that kept the change carries no message" do
+      assert_nil HubKernel::Answer.met!(Kept.new).message
+    end
   end
 end
