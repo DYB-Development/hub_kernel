@@ -18,4 +18,13 @@ class HostPageTest < ActionDispatch::IntegrationTest
 
     assert_select "form[action=?]", "/account_profile"
   end
+
+  test "the gem's follow-up runs in the request once the change is kept" do
+    get "/profile"
+    assert_equal "set-before-the-save", cookies[:pretend_gem_theme]
+
+    patch "/profile", params: { name: "Renamed Person" }
+
+    assert_empty cookies[:pretend_gem_theme].to_s
+  end
 end
