@@ -3,6 +3,12 @@ require "hub_kernel/answer"
 
 module HubKernel
   class AnswerTest < ActiveSupport::TestCase
+    class Refused
+      def ok? = false
+
+      def message = "That colour is not one of the ones on offer"
+    end
+
     class Kept
       def ok? = true
 
@@ -23,6 +29,10 @@ module HubKernel
       end
 
       assert_match(/ok\?/, error.message)
+    end
+
+    test "an answer that was not kept carries the reason" do
+      assert_equal "That colour is not one of the ones on offer", HubKernel::Answer.met!(Refused.new).message
     end
   end
 end
