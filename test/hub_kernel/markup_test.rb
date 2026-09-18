@@ -24,5 +24,9 @@ module HubKernel
 
       assert_empty mentions
     end
+
+    test "the path an example gem offers reaches the host's stylesheet build" do
+      assert_includes PretendGem::Markup.paths_for_the_stylesheet_build, PretendGem::Markup.markup_path
+    end
   end
 end
