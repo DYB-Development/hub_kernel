@@ -18,6 +18,12 @@ module HubKernel
           assert_includes rendered, 'action="/an/address"'
         end
 
+        test "it reads nothing from an instance variable" do
+          source = File.read(lookup_context.find(the_markup, [], true).identifier)
+
+          assert_no_match(/@[a-z_]+/, source)
+        end
+
         test "it draws no page heading, page frame or layout of its own" do
           render partial: the_markup, locals: { person: a_person, account: an_account, submit_url: "/an/address" }
 
