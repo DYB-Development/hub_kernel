@@ -1,0 +1,6 @@
+<form action="<%= submit_url %>" method="post">
+  <input type="hidden" name="_method" value="patch">
+  <label for="name">Name</label>
+  <input type="text" id="name" name="name" value="<%= PretendGem::Names.for(person) %>">
+  <button type="submit">Save</button>
+</form>
