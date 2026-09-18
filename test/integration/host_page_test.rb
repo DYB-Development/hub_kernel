@@ -31,7 +31,7 @@ class HostPageTest < ActionDispatch::IntegrationTest
   test "a refused change runs no follow-up" do
     get "/profile"
 
-    patch "/profile", params: {name: ""}
+    patch "/profile", params: { name: "" }
 
     assert_equal "set-before-the-save", cookies[:pretend_gem_theme]
   end
