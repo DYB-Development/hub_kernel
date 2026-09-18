@@ -8,8 +8,14 @@ class HostPageTest < ActionDispatch::IntegrationTest
   end
 
   test "submitting the markup at the host's address shows the saved value on the host's page" do
-    patch "/profile", params: {name: "Renamed Person"}
+    patch "/profile", params: { name: "Renamed Person" }
 
     assert_select "input[name=name][value=?]", "Renamed Person"
+  end
+
+  test "a second host rendering the same markup submits to its own address" do
+    get "/account_profile"
+
+    assert_select "form[action=?]", "/account_profile"
   end
 end

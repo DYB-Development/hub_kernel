@@ -1,5 +1,5 @@
 class ProfilesController < ApplicationController
-  helper_method :current_person, :current_account
+  helper_method :current_person, :current_account, :submit_url
 
   def show
   end
@@ -12,6 +12,10 @@ class ProfilesController < ApplicationController
   end
 
   private
+
+  def submit_url
+    profile_path
+  end
 
   def current_person
     "a-person"
