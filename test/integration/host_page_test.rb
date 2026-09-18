@@ -27,4 +27,12 @@ class HostPageTest < ActionDispatch::IntegrationTest
 
     assert_empty cookies[:pretend_gem_theme].to_s
   end
+
+  test "a refused change runs no follow-up" do
+    get "/profile"
+
+    patch "/profile", params: {name: ""}
+
+    assert_equal "set-before-the-save", cookies[:pretend_gem_theme]
+  end
 end
