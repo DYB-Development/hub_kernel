@@ -1,5 +1,6 @@
 require "test_helper"
 require "hub_kernel/ports"
+require "open3"
 
 module HubKernel
   class PortsTest < ActiveSupport::TestCase
@@ -48,6 +49,13 @@ module HubKernel
       assert_raises(HubKernel::UnwiredPortError, match: "Finance's job chooser is not wired") do
         Finance.job_choices
       end
+    end
+
+    test "an app that requires hub_kernel can declare ports with no further require" do
+      script = 'require "rails"; require "hub_kernel"; module Sales; extend HubKernel::Ports; port :namer, as: :name_of; end; print "declared"'
+      output, = Open3.capture2e(RbConfig.ruby, "-I", File.expand_path("../../lib", __dir__), "-e", script)
+
+      assert_equal "declared", output
     end
   end
 end

@@ -4,6 +4,7 @@ require "hub_kernel/action"
 require "hub_kernel/answer"
 require "hub_kernel/follow_up"
 require "hub_kernel/markup"
+require "hub_kernel/ports"
 
 module HubKernel
 end
