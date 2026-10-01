@@ -29,6 +29,13 @@ module HubKernel
         assert_equal "Sales' payment lister is filled with something that cannot be called", hub_check_failure(Sales)
       end
 
+      test "a hub with every port filled with something that can be called passes the hub check" do
+        Sales.person_chooser = -> { [] }
+        Sales.payment_lister = ->(job_id) { [ job_id ] }
+
+        assert_nil hub_check_failure(Sales)
+      end
+
       private
 
       def hub_check_failure(hub)
