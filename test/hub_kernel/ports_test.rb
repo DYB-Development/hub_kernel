@@ -9,6 +9,12 @@ module HubKernel
       port :spend_recorder, as: :record_spend
     end
 
+    module Finance
+      extend HubKernel::Ports
+
+      port :job_chooser, as: :job_choices
+    end
+
     teardown do
       Supplies.spend_recorder = nil
     end
@@ -35,6 +41,12 @@ module HubKernel
     test "calling a port the app left unfilled raises an error naming the hub and the port" do
       assert_raises(HubKernel::UnwiredPortError, match: "Supplies' spend recorder is not wired") do
         Supplies.record_spend(amount: 5)
+      end
+    end
+
+    test "the unfilled port error names a hub not ending in s with an apostrophe s" do
+      assert_raises(HubKernel::UnwiredPortError, match: "Finance's job chooser is not wired") do
+        Finance.job_choices
       end
     end
   end

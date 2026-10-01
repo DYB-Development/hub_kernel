@@ -1,6 +1,5 @@
 require "active_support/core_ext/string/inflections"
 
-
 module HubKernel
   class UnwiredPortError < StandardError; end
 
@@ -14,7 +13,9 @@ module HubKernel
     private
 
     def unwired(name)
-      ->(*, **) { raise UnwiredPortError, "#{self.name.demodulize}' #{name.to_s.tr("_", " ")} is not wired" }
+      ->(*, **) { raise UnwiredPortError, "#{hub_name} #{name.to_s.tr("_", " ")} is not wired" }
     end
+
+    def hub_name = self.name.demodulize.then { |hub| hub.end_with?("s") ? "#{hub}'" : "#{hub}'s" }
   end
 end
