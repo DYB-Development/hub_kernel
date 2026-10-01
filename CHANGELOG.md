@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-01
+
+### Removed
+- `HubKernel::Events`, with `UndeclaredEventError` and `UnwiredEventError`. Nothing used it, and events between hubs belong to the event_engine gems.
+
 ## [0.3.0] - 2026-10-01
 
 ### Added
