@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-01
+
+### Added
+- `HubKernel::Hubs.list`, every hub that declared a port. A hub declared again on a code reload is on it once.
+- `HubKernel::Hubs.check!`, which an app calls after filling its ports. It raises `HubKernel::UnwiredPortError` naming every unfilled port with its hub, one per line.
+
 ## [0.2.0] - 2026-10-01
 
 ### Added
