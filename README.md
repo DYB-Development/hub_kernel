@@ -28,6 +28,22 @@ returns its answer. An error it raises reaches the caller unchanged. Calling a p
 app left unfilled raises `HubKernel::UnwiredPortError`, such as "Supplies' spend
 recorder is not wired".
 
+### The start check
+Every hub that declares a port is on `HubKernel::Hubs.list`. Call
+`HubKernel::Hubs.check!` after the app fills its ports, and the app refuses to start
+while any port is unfilled:
+
+```ruby
+Rails.application.config.to_prepare do
+  Supplies.spend_recorder = Finance.method(:record_spend)
+  HubKernel::Hubs.check!
+end
+```
+
+It raises `HubKernel::UnwiredPortError` naming every unfilled port with its hub, one per
+line. Running it inside `to_prepare` checks again after every code reload, and a hub
+declared again on a reload stays on the list once.
+
 ## Installation
 Add this line to your application's Gemfile:
 
