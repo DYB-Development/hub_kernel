@@ -31,5 +31,11 @@ module HubKernel
 
       assert_raises(refusal, match: "the card is closed") { Supplies.record_spend(amount: 5) }
     end
+
+    test "calling a port the app left unfilled raises an error naming the hub and the port" do
+      assert_raises(HubKernel::UnwiredPortError, match: "Supplies' spend recorder is not wired") do
+        Supplies.record_spend(amount: 5)
+      end
+    end
   end
 end
