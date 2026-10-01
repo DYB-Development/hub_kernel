@@ -1,10 +1,12 @@
 require "active_support/core_ext/string/inflections"
+require "hub_kernel/hubs"
 
 module HubKernel
   class UnwiredPortError < StandardError; end
 
   module Ports
     def port(name, as:)
+      Hubs.add(self)
       singleton_class.attr_writer name
       define_singleton_method(name) { instance_variable_get(:"@#{name}") || unwired(name) }
       define_singleton_method(as) { |*args, **options| public_send(name).call(*args, **options) }
