@@ -24,5 +24,12 @@ module HubKernel
 
       assert_equal [ [ :supplies ], { amount: 5 } ], Supplies.record_spend(:supplies, amount: 5)
     end
+
+    test "an error raised by whatever filled a port reaches the caller unchanged" do
+      refusal = Class.new(StandardError)
+      Supplies.spend_recorder = ->(**) { raise refusal, "the card is closed" }
+
+      assert_raises(refusal, match: "the card is closed") { Supplies.record_spend(amount: 5) }
+    end
   end
 end
