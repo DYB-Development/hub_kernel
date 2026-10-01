@@ -44,6 +44,23 @@ It raises `HubKernel::UnwiredPortError` naming every unfilled port with its hub,
 line. Running it inside `to_prepare` checks again after every code reload, and a hub
 declared again on a reload stays on the list once.
 
+### The hub check
+A hub's own test can check that the app filled every one of its ports, so a missing
+fill shows in the suite rather than on the next start:
+
+```ruby
+require "hub_kernel/conformance/hub"
+
+class SuppliesHubTest < ActiveSupport::TestCase
+  include HubKernel::Conformance::Hub
+
+  hub { Supplies }
+end
+```
+
+The test fails and names each port the app left unfilled, and each port filled with
+something that cannot be called.
+
 ## Installation
 Add this line to your application's Gemfile:
 

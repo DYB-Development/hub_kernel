@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-10-01
+
+### Added
+- `HubKernel::Conformance::Hub`, which a hub's test includes with `hub { Supplies }`. The test fails and names each port the app left unfilled, and each port filled with something that cannot be called.
+- `uncallable_ports` on a hub, listing each port filled with something that cannot be called.
+
 ## [0.4.0] - 2026-10-01
 
 ### Removed
