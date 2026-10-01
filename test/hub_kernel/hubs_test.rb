@@ -34,5 +34,23 @@ module HubKernel
 
       assert_nothing_raised { HubKernel::Hubs.check! }
     end
+
+    test "a hub declared again on a code reload is on the list once" do
+      2.times { declare_catalog }
+
+      assert_equal 1, HubKernel::Hubs.list.count { |hub| hub.name == "HubKernel::HubsTest::Catalog" }
+    ensure
+      HubsTest.send(:remove_const, :Catalog)
+    end
+
+    private
+
+    def declare_catalog
+      HubsTest.send(:remove_const, :Catalog) if HubsTest.const_defined?(:Catalog, false)
+      HubsTest.const_set(:Catalog, Module.new).then do |catalog|
+        catalog.extend(HubKernel::Ports)
+        catalog.port(:unit_coster, as: :consumable_unit_cost)
+      end
+    end
   end
 end

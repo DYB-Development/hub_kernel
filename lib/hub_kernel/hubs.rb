@@ -1,6 +1,9 @@
 module HubKernel
   module Hubs
-    def self.add(hub) = list << hub
+    def self.add(hub)
+      list.reject! { |listed| listed.name == hub.name }
+      list << hub
+    end
 
     def self.list = @list ||= []
 
