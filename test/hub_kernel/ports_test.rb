@@ -18,5 +18,11 @@ module HubKernel
 
       assert_equal 41, Supplies.record_spend(amount: 5)
     end
+
+    test "the caller's arguments reach whatever the app filled a port with" do
+      Supplies.spend_recorder = ->(*args, **options) { [ args, options ] }
+
+      assert_equal [ [ :supplies ], { amount: 5 } ], Supplies.record_spend(:supplies, amount: 5)
+    end
   end
 end
