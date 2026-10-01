@@ -22,6 +22,13 @@ module HubKernel
         assert_equal "Sales' payment lister is not wired", hub_check_failure(Sales)
       end
 
+      test "a port filled with something that cannot be called fails the hub check and is named" do
+        Sales.person_chooser = -> { [] }
+        Sales.payment_lister = "the payments page"
+
+        assert_equal "Sales' payment lister is filled with something that cannot be called", hub_check_failure(Sales)
+      end
+
       private
 
       def hub_check_failure(hub)
