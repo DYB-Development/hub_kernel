@@ -13,5 +13,11 @@ module HubKernel
 
       assert_file "app/models/billing.rb", /module Billing\n  extend HubKernel::Ports\n/
     end
+
+    test "each port named as port and method is declared in the hub module" do
+      run_generator [ "Billing", "spend_recorder:record_spend", "job_chooser:job_choices" ]
+
+      assert_file "app/models/billing.rb", /  port :spend_recorder, as: :record_spend\n  port :job_chooser, as: :job_choices\n/
+    end
   end
 end
