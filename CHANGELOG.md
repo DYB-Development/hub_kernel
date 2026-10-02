@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-10-02
+
+### Added
+- `bin/rails generate hub_kernel:hub NAME port:method ...`, which writes a hub module that extends `HubKernel::Ports` and declares each named port, and a test for the hub that includes `HubKernel::Conformance::Hub`. A namespaced name writes both at the matching nested path.
+
 ## [0.6.0] - 2026-10-02
 
 ### Added

@@ -3,6 +3,18 @@ Gives every hub in a Rails app one way to declare what it needs from another hub
 
 ## Usage
 
+### Starting a hub
+The generator writes a new hub's module and its test. Name each port as the port and
+the method the hub's own code calls:
+
+```bash
+bin/rails generate hub_kernel:hub Console::Hubs::Billing spend_recorder:record_spend
+```
+
+It writes `app/models/console/hubs/billing.rb`, which extends `HubKernel::Ports` and
+declares each port, and `test/models/console/hubs/billing_test.rb`, which includes the
+hub check below. The app then fills the new ports where it fills its others.
+
 ### Ports
 A port is something a hub needs from outside itself. The hub declares it by name,
 with the method its own code calls:
