@@ -11,10 +11,16 @@ module HubKernel
 
     def in(path, source)
       hub = owner_of_file(path)
-      source.scan(/[A-Z]\w*(?:::[A-Z]\w*)*/).filter_map { |name| owned_class_in(name) }.uniq.reject { |name| @shared.include?(name) || owner_of(name) == hub || (hub == @host_layer && @interfaces.value?(name)) }
+      source.scan(/[A-Z]\w*(?:::[A-Z]\w*)*/).filter_map { |name| owned_class_in(name) }.uniq.select { |name| crossing?(name, hub) }
     end
 
     private
+
+    def crossing?(name, hub)
+      return false if @shared.include?(name) || owner_of(name) == hub
+
+      !(hub == @host_layer && @interfaces.value?(name))
+    end
 
     def owned_class_in(name)
       parts = name.split("::")
