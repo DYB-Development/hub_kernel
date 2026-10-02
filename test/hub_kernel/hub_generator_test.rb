@@ -37,5 +37,16 @@ module HubKernel
 
       assert_file "test/models/console/hubs/billing_test.rb", /class Console::Hubs::BillingTest < ActiveSupport::TestCase\n/
     end
+
+    test "a generated hub loads and calls whatever the app filled its port with" do
+      run_generator [ "GeneratedLedger", "entry_recorder:record_entry" ]
+      load File.join(destination_root, "app/models/generated_ledger.rb")
+      GeneratedLedger.entry_recorder = ->(amount:) { amount }
+
+      assert_equal 5, GeneratedLedger.record_entry(amount: 5)
+    ensure
+      HubKernel::Hubs.list.reject! { |hub| hub.name == "GeneratedLedger" }
+      Object.send(:remove_const, :GeneratedLedger) if Object.const_defined?(:GeneratedLedger)
+    end
   end
 end
