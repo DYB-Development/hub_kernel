@@ -8,10 +8,15 @@ module HubKernel
 
     def in(path, source)
       hub = owner_of_file(path)
-      source.scan(/[A-Z]\w*(?:::[A-Z]\w*)*/).uniq.select { |name| owner_of(name) && owner_of(name) != hub }
+      source.scan(/[A-Z]\w*(?:::[A-Z]\w*)*/).filter_map { |name| owned_class_in(name) }.uniq.select { |name| owner_of(name) != hub }
     end
 
     private
+
+    def owned_class_in(name)
+      parts = name.split("::")
+      parts.size.downto(1).map { |size| parts.first(size).join("::") }.find { |candidate| owner_of(candidate) }
+    end
 
     def owner_of(class_name) = @owners.find { |_hub, classes| classes.include?(class_name) }&.first
 

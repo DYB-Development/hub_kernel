@@ -13,5 +13,11 @@ module HubKernel
 
       assert_equal [ "Shop::Expense" ], crossings.in("app/models/shop/purchase.rb", "Shop::Expense.create!(name: name)")
     end
+
+    test "naming a constant inside another hub's class names that class" do
+      crossings = HubKernel::Crossings.new(owners: OWNERS)
+
+      assert_equal [ "Shop::Expense" ], crossings.in("app/models/shop/purchase.rb", "Shop::Expense::KINDS.first")
+    end
   end
 end
