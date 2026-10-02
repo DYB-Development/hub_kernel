@@ -15,6 +15,14 @@ module HubKernel
         end
       end
 
+      test "the crossing check passes when no file names another hub's class" do
+        Dir.mktmpdir do |root|
+          write(root, "app/models/shop/purchase.rb", "Shop::Purchase.where(name: name)")
+
+          assert_nil crossing_check_failure(root)
+        end
+      end
+
       private
 
       def write(root, path, source)
