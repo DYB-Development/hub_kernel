@@ -26,7 +26,15 @@ module HubKernel
         RUBY
       end
 
+      def depend_on_hub_kernel
+        return unless gemspec
+
+        inject_into_file gemspec, "  spec.add_dependency \"hub_kernel\", \"~> #{HubKernel::VERSION[/\A\d+\.\d+/]}\"\n", before: /^end\s*\z/
+      end
+
       private
+
+      def gemspec = Dir.glob("*.gemspec", base: destination_root).first
 
       def port_lines
         return "" if ports.empty?

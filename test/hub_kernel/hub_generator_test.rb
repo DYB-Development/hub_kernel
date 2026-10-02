@@ -48,5 +48,23 @@ module HubKernel
       HubKernel::Hubs.list.reject! { |hub| hub.name == "GeneratedLedger" }
       Object.send(:remove_const, :GeneratedLedger) if Object.const_defined?(:GeneratedLedger)
     end
+
+    test "a hub generated inside a gem adds hub_kernel to the gem's gemspec" do
+      write_gemspec
+      run_generator [ "Billing" ]
+
+      assert_file "billing.gemspec", /  spec.add_dependency "hub_kernel", "~> #{HubKernel::VERSION[/\A\d+\.\d+/]}"\nend/
+    end
+
+    private
+
+    def write_gemspec
+      File.write(File.join(destination_root, "billing.gemspec"), <<~RUBY)
+        Gem::Specification.new do |spec|
+          spec.name = "billing"
+          spec.add_dependency "rails", ">= 8.1"
+        end
+      RUBY
+    end
   end
 end
