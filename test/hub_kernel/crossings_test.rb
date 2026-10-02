@@ -37,5 +37,11 @@ module HubKernel
 
       assert_empty crossings.in("app/views/shop/purchases/index.html.erb", "<%= Shop::Purchase.count %>")
     end
+
+    test "a view with no controller of its own belongs to the host's layer" do
+      crossings = HubKernel::Crossings.new(owners: { supplies: %w[Shop::Purchase], console: %w[Shop::Judgement] }, host_layer: :console)
+
+      assert_empty crossings.in("app/views/shop/home/index.html.erb", "<%= Shop::Judgement.current %>")
+    end
   end
 end

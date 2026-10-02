@@ -2,9 +2,10 @@ require "active_support/core_ext/string/inflections"
 
 module HubKernel
   class Crossings
-    def initialize(owners:, shared: [])
+    def initialize(owners:, shared: [], host_layer: nil)
       @owners = owners
       @shared = shared
+      @host_layer = host_layer
     end
 
     def in(path, source)
@@ -22,7 +23,7 @@ module HubKernel
     def owner_of(class_name) = @owners.find { |_hub, classes| classes.include?(class_name) }&.first
 
     def owner_of_file(path)
-      return owner_of("#{File.dirname(path.delete_prefix("app/views/")).camelize}Controller") if path.start_with?("app/views/")
+      return owner_of("#{File.dirname(path.delete_prefix("app/views/")).camelize}Controller") || @host_layer if path.start_with?("app/views/")
 
       owner_of(path.sub(%r{\Aapp/[^/]+/}, "").delete_suffix(".rb").camelize)
     end
