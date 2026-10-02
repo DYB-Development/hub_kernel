@@ -4,6 +4,12 @@ require "open3"
 
 module HubKernel
   class ExposesTest < ActiveSupport::TestCase
+    module Pantry
+      extend HubKernel::Exposes
+
+      exposes :count_jars, takes: %i[shelves], writes: false
+    end
+
     module Supplies
       extend HubKernel::Exposes
 
@@ -19,6 +25,10 @@ module HubKernel
       output, = Open3.capture2e(RbConfig.ruby, "-I", File.expand_path("../../lib", __dir__), "-e", script)
 
       assert_equal "exposed", output
+    end
+
+    test "an exposed name the hub has no method for is named" do
+      assert_equal [ "Pantry exposes count_jars, which it has no method for" ], Pantry.exposure_problems
     end
   end
 end
