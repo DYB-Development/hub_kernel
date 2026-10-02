@@ -10,6 +10,14 @@ module HubKernel
       exposes :count_jars, takes: %i[shelves], writes: false
     end
 
+    module Shed
+      extend HubKernel::Exposes
+
+      exposes :stack_boxes, takes: %i[rows], writes: true
+
+      def self.stack_boxes(shelves:) = shelves
+    end
+
     module Supplies
       extend HubKernel::Exposes
 
@@ -29,6 +37,10 @@ module HubKernel
 
     test "an exposed name the hub has no method for is named" do
       assert_equal [ "Pantry exposes count_jars, which it has no method for" ], Pantry.exposure_problems
+    end
+
+    test "an exposed method listed with values it does not take is named" do
+      assert_equal [ "Shed exposes stack_boxes with rows, but it takes shelves" ], Shed.exposure_problems
     end
   end
 end
