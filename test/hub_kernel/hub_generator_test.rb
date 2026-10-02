@@ -31,5 +31,11 @@ module HubKernel
 
       assert_file "app/models/console/hubs/billing.rb", /module Console::Hubs::Billing\n/
     end
+
+    test "a namespaced hub's test is generated at the matching nested path" do
+      run_generator [ "Console::Hubs::Billing" ]
+
+      assert_file "test/models/console/hubs/billing_test.rb", /class Console::Hubs::BillingTest < ActiveSupport::TestCase\n/
+    end
   end
 end
