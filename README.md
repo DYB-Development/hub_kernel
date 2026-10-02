@@ -4,16 +4,43 @@ Gives every hub in a Rails app one way to declare what it needs from another hub
 ## Usage
 
 ### Starting a hub
-The generator writes a new hub's module and its test. Name each port as the port and
-the method the hub's own code calls:
+A hub usually lives in a domain gem, next to the domain logic it serves. Run the
+generator from the gem's root, naming each port as the port and the method the hub's
+own code calls:
 
 ```bash
-bin/rails generate hub_kernel:hub Console::Hubs::Billing spend_recorder:record_spend
+bin/rails generate hub_kernel:hub Ledger entry_recorder:record_entry
 ```
 
-It writes `app/models/console/hubs/billing.rb`, which extends `HubKernel::Ports` and
-declares each port, and `test/models/console/hubs/billing_test.rb`, which includes the
-hub check below. The app then fills the new ports where it fills its others.
+Inside a Rails engine gem it writes the hub under the gem's namespace, such as
+`app/models/billing/ledger.rb` with `module Billing::Ledger`, which extends
+`HubKernel::Ports` and declares each port. It also adds hub_kernel to the gem's
+gemspec. It writes no hub check into the gem's tests, since the gem never fills its own
+ports.
+
+### Using a hub from a gem
+The app that installs the gem fills each of the hub's ports in its own setup, then
+runs the start check:
+
+```ruby
+Rails.application.config.to_prepare do
+  Billing::Ledger.entry_recorder = Finance.method(:record_entry)
+  HubKernel::Hubs.check!
+end
+```
+
+The app's own test for that hub includes the hub check, where the ports are filled:
+
+```ruby
+class Billing::LedgerHubTest < ActiveSupport::TestCase
+  include HubKernel::Conformance::Hub
+
+  hub { Billing::Ledger }
+end
+```
+
+Run inside an app rather than a gem, the generator writes the hub under
+`app/models` and its hub check under `test/models`.
 
 ### Ports
 A port is something a hub needs from outside itself. The hub declares it by name,
