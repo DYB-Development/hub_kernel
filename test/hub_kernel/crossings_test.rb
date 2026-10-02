@@ -43,5 +43,11 @@ module HubKernel
 
       assert_empty crossings.in("app/views/shop/home/index.html.erb", "<%= Shop::Judgement.current %>")
     end
+
+    test "a view in a folder named after a record belongs to that record's hub" do
+      crossings = HubKernel::Crossings.new(owners: OWNERS, host_layer: :console)
+
+      assert_empty crossings.in("app/views/shop/purchase/_row.html.erb", "<%= Shop::Purchase.model_name %>")
+    end
   end
 end

@@ -23,9 +23,11 @@ module HubKernel
     def owner_of(class_name) = @owners.find { |_hub, classes| classes.include?(class_name) }&.first
 
     def owner_of_file(path)
-      return owner_of("#{File.dirname(path.delete_prefix("app/views/")).camelize}Controller") || @host_layer if path.start_with?("app/views/")
+      return owner_of_view_folder(File.dirname(path.delete_prefix("app/views/")).camelize) if path.start_with?("app/views/")
 
       owner_of(path.sub(%r{\Aapp/[^/]+/}, "").delete_suffix(".rb").camelize)
     end
+
+    def owner_of_view_folder(folder) = owner_of("#{folder}Controller") || owner_of(folder) || @host_layer
   end
 end
