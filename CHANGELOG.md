@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-10-02
+
+### Changed
+- Run inside a gem, the hub generator adds hub_kernel to the gem's gemspec, once however many hubs it generates, and writes no hub check into the gem's tests. Run inside an app it behaves as before.
+
 ## [0.7.0] - 2026-10-02
 
 ### Added
