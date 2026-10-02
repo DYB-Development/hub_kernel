@@ -25,5 +25,11 @@ module HubKernel
 
       assert_empty crossings.in("app/models/shop/purchase.rb", "Shop.table_name_prefix")
     end
+
+    test "naming a class on the shared list is not a crossing" do
+      crossings = HubKernel::Crossings.new(owners: OWNERS, shared: %w[Shop::Expense])
+
+      assert_empty crossings.in("app/models/shop/purchase.rb", "Shop::Expense.create!(name: name)")
+    end
   end
 end
