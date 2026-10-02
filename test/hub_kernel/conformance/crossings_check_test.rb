@@ -31,6 +31,14 @@ module HubKernel
         end
       end
 
+      test "the crossing check leaves out the files the host excepts" do
+        Dir.mktmpdir do |root|
+          write(root, "app/models/shop/hubs.rb", "Shop::Expense")
+
+          assert_nil crossing_check_failure(root, except: [ "app/models/shop/hubs.rb" ])
+        end
+      end
+
       private
 
       def write(root, path, source)
