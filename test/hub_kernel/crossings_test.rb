@@ -49,5 +49,11 @@ module HubKernel
 
       assert_empty crossings.in("app/views/shop/purchase/_row.html.erb", "<%= Shop::Purchase.model_name %>")
     end
+
+    test "a hub naming another hub's interface module is a crossing" do
+      crossings = HubKernel::Crossings.new(owners: OWNERS, interfaces: { finance: "Shop::Hubs::Finance" })
+
+      assert_equal [ "Shop::Hubs::Finance" ], crossings.in("app/models/shop/purchase.rb", "Shop::Hubs::Finance.record_spend(amount: 5)")
+    end
   end
 end
