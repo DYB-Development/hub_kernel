@@ -55,5 +55,11 @@ module HubKernel
 
       assert_equal [ "Shop::Hubs::Finance" ], crossings.in("app/models/shop/purchase.rb", "Shop::Hubs::Finance.record_spend(amount: 5)")
     end
+
+    test "the host's layer may name any hub's interface module" do
+      crossings = HubKernel::Crossings.new(owners: { console: %w[Shop::Judgement] }, host_layer: :console, interfaces: { finance: "Shop::Hubs::Finance" })
+
+      assert_empty crossings.in("app/models/shop/judgement.rb", "Shop::Hubs::Finance.balance")
+    end
   end
 end
