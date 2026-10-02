@@ -61,6 +61,22 @@ end
 The test fails and names each port the app left unfilled, and each port filled with
 something that cannot be called.
 
+### The exposed list
+A hub names each method outside callers may reach, the values it takes, and whether it
+writes. A layer such as a JSON endpoint looks a method up by name and serves only what
+the hub exposes:
+
+```ruby
+module Supplies
+  extend HubKernel::Exposes
+
+  exposes :record_purchase, takes: %i[supplier_id bought_on lines], writes: true
+end
+
+Supplies.exposed("record_purchase").takes # => [:supplier_id, :bought_on, :lines]
+Supplies.exposed("delete_everything")     # => nil
+```
+
 ## Installation
 Add this line to your application's Gemfile:
 

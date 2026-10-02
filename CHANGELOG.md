@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-10-02
+
+### Added
+- `HubKernel::Exposes`, which lets a hub name each method outside callers may reach with `exposes :record_purchase, takes: [...], writes: true`.
+- `exposed(name)` on a hub, which finds an exposed method by its name and gives `nil` for a name the hub does not expose.
+
 ## [0.5.0] - 2026-10-01
 
 ### Added
