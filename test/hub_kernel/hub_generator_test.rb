@@ -64,6 +64,13 @@ module HubKernel
       assert_equal 1, File.read(File.join(destination_root, "billing.gemspec")).scan('add_dependency "hub_kernel"').size
     end
 
+    test "a hub generated inside a gem gets no hub check in the gem's own tests" do
+      write_gemspec
+      run_generator [ "Billing" ]
+
+      assert_no_file "test/models/billing_test.rb"
+    end
+
     private
 
     def write_gemspec
