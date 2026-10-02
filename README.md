@@ -116,6 +116,24 @@ Supplies.exposed("record_purchase").takes # => [:supplier_id, :bought_on, :lines
 Supplies.exposed("delete_everything")     # => nil
 ```
 
+### The exposed-list check
+A hub's own test can check its exposed list, so a listed method the hub lacks, or one
+listed with values it does not take, shows in the suite rather than on a caller's
+request:
+
+```ruby
+require "hub_kernel/conformance/exposed"
+
+class SuppliesHubTest < ActiveSupport::TestCase
+  include HubKernel::Conformance::Exposed
+
+  hub { Supplies }
+end
+```
+
+The test fails and names each problem. A method that takes `**` values accepts any
+values it is listed with, as long as it is listed with each value it requires.
+
 ## Installation
 Add this line to your application's Gemfile:
 
