@@ -134,6 +134,36 @@ end
 The test fails and names each problem. A method that takes `**` values accepts any
 values it is listed with, as long as it is listed with each value it requires.
 
+### The crossing check
+A host's test can check that no hub's code names a class another hub owns. The host
+passes a map of which classes each hub owns, and the test fails listing each file and
+the class it names:
+
+```ruby
+require "hub_kernel/conformance/crossings"
+
+class HubCrossingsTest < ActiveSupport::TestCase
+  include HubKernel::Conformance::Crossings
+
+  crossings files: "app/{models,controllers,jobs,views}/shop/**/*.{rb,erb}", except: [ "app/models/shop/hubs.rb" ] do
+    HubKernel::Crossings.new(
+      owners: { supplies: %w[Shop::Purchase Shop::PurchasesController], finance: %w[Shop::Expense], shop: %w[Shop::Home] },
+      shared: %w[Shop::BaseController],
+      host_layer: :shop,
+      interfaces: { supplies: "Shop::Hubs::Supplies", finance: "Shop::Hubs::Finance" }
+    )
+  end
+end
+```
+
+- A constant inside another hub's class counts as naming that class.
+- A name no hub owns, such as a namespace, is not a crossing, and neither is a class on
+  the `shared` list.
+- A view belongs to the hub that owns its controller, then to the hub that owns the
+  record its folder is named after, and otherwise to the `host_layer`.
+- The host's layer may name any hub's interface module, and a hub naming another hub's
+  interface module is a crossing.
+
 ## Installation
 Add this line to your application's Gemfile:
 

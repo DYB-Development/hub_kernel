@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-10-02
+
+### Added
+- `HubKernel::Crossings`, which takes a map of the classes each hub owns, a shared list, the host's layer and each hub's interface module, and lists the classes a file names that another hub owns.
+- `HubKernel::Conformance::Crossings`, which a host's test includes with `crossings { HubKernel::Crossings.new(...) }`. It reads the files the host names and fails listing each file and the class it names.
+
 ## [0.9.0] - 2026-10-02
 
 ### Added
