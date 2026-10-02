@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-10-02
+
+### Added
+- `HubKernel::Conformance::Exposed`, which a hub's test includes with `hub { Supplies }`. The test fails and names each exposed method the hub lacks, and each one listed with values it does not take.
+- `exposure_problems` on a hub, listing each problem with its exposed list.
+
 ## [0.8.0] - 2026-10-02
 
 ### Changed
