@@ -56,6 +56,14 @@ module HubKernel
       assert_file "billing.gemspec", /  spec.add_dependency "hub_kernel", "~> #{HubKernel::VERSION[/\A\d+\.\d+/]}"\nend/
     end
 
+    test "a second hub generated inside the same gem does not add hub_kernel twice" do
+      write_gemspec
+      run_generator [ "Billing" ]
+      run_generator [ "Invoicing" ]
+
+      assert_equal 1, File.read(File.join(destination_root, "billing.gemspec")).scan('add_dependency "hub_kernel"').size
+    end
+
     private
 
     def write_gemspec
