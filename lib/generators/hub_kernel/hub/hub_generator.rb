@@ -13,6 +13,19 @@ module HubKernel
         RUBY
       end
 
+      def create_hub_test
+        create_file "test/models/#{file_path}_test.rb", <<~RUBY
+          require "test_helper"
+          require "hub_kernel/conformance/hub"
+
+          class #{class_name}Test < ActiveSupport::TestCase
+            include HubKernel::Conformance::Hub
+
+            hub { #{class_name} }
+          end
+        RUBY
+      end
+
       private
 
       def port_lines

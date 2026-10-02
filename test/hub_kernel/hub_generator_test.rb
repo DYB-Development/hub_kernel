@@ -19,5 +19,11 @@ module HubKernel
 
       assert_file "app/models/billing.rb", /  port :spend_recorder, as: :record_spend\n  port :job_chooser, as: :job_choices\n/
     end
+
+    test "the generated hub test includes hub_kernel's hub check for the hub" do
+      run_generator [ "Billing" ]
+
+      assert_file "test/models/billing_test.rb", /class BillingTest < ActiveSupport::TestCase\n  include HubKernel::Conformance::Hub\n\n  hub { Billing }\nend/
+    end
   end
 end
