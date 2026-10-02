@@ -21,6 +21,10 @@ module HubKernel
 
     def owner_of(class_name) = @owners.find { |_hub, classes| classes.include?(class_name) }&.first
 
-    def owner_of_file(path) = owner_of(path.sub(%r{\Aapp/[^/]+/}, "").delete_suffix(".rb").camelize)
+    def owner_of_file(path)
+      return owner_of("#{File.dirname(path.delete_prefix("app/views/")).camelize}Controller") if path.start_with?("app/views/")
+
+      owner_of(path.sub(%r{\Aapp/[^/]+/}, "").delete_suffix(".rb").camelize)
+    end
   end
 end
