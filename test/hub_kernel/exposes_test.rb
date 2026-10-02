@@ -18,6 +18,14 @@ module HubKernel
       def self.stack_boxes(shelves:) = shelves
     end
 
+    module Barn
+      extend HubKernel::Exposes
+
+      exposes :add_bale, takes: %i[name weight], writes: true
+
+      def self.add_bale(**fields) = fields
+    end
+
     module Supplies
       extend HubKernel::Exposes
 
@@ -41,6 +49,10 @@ module HubKernel
 
     test "an exposed method listed with values it does not take is named" do
       assert_equal [ "Shed exposes stack_boxes with rows, but it takes shelves" ], Shed.exposure_problems
+    end
+
+    test "an exposed method that takes any values is not named for the values it is listed with" do
+      assert_empty Barn.exposure_problems
     end
   end
 end

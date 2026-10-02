@@ -26,8 +26,10 @@ module HubKernel
     end
 
     def takes_listed_values?(exposure)
-      (keywords(exposure, :keyreq) - exposure.takes).empty? && (exposure.takes - keywords(exposure, :keyreq, :key)).empty?
+      (keywords(exposure, :keyreq) - exposure.takes).empty? && (takes_any_values?(exposure) || (exposure.takes - keywords(exposure, :keyreq, :key)).empty?)
     end
+
+    def takes_any_values?(exposure) = method(exposure.name).parameters.any? { |kind, _| kind == :keyrest }
 
     def keywords(exposure, *kinds) = method(exposure.name).parameters.filter_map { |kind, value| value if kinds.include?(kind) }
   end
