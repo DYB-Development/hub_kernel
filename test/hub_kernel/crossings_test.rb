@@ -19,5 +19,11 @@ module HubKernel
 
       assert_equal [ "Shop::Expense" ], crossings.in("app/models/shop/purchase.rb", "Shop::Expense::KINDS.first")
     end
+
+    test "naming a namespace no hub owns is not a crossing" do
+      crossings = HubKernel::Crossings.new(owners: OWNERS)
+
+      assert_empty crossings.in("app/models/shop/purchase.rb", "Shop.table_name_prefix")
+    end
   end
 end
