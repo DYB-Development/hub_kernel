@@ -31,5 +31,11 @@ module HubKernel
 
       assert_empty crossings.in("app/models/shop/purchase.rb", "Shop::Expense.create!(name: name)")
     end
+
+    test "a view belongs to the hub that owns its controller" do
+      crossings = HubKernel::Crossings.new(owners: { supplies: %w[Shop::Purchase Shop::PurchasesController] })
+
+      assert_empty crossings.in("app/views/shop/purchases/index.html.erb", "<%= Shop::Purchase.count %>")
+    end
   end
 end
