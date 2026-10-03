@@ -17,7 +17,7 @@ module HubKernel
       missing = keywords(exposure, :keyreq) - values.keys
       raise MissingArgumentError, "Give #{missing.join(", ")}" if missing.any?
 
-      public_send(exposure.name, **values)
+      public_send(exposure.name, **values.slice(*exposure.takes))
     end
 
     def exposure_problems
