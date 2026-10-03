@@ -13,12 +13,11 @@ module HubKernel
     def exposed(name) = exposed_methods[name.to_s]
 
     def call_exposed(name, values:, person:, account:)
-      raise MissingArgumentError, "A call by name needs a account" if account.nil?
       raise MissingArgumentError, "A call by name needs a person" if person.nil?
-      exposure = exposed(name) || raise(UnexposedMethodError, "#{exposing_hub} does not expose #{name}")
-      missing = keywords(exposure, :keyreq) - values.keys
-      raise MissingArgumentError, "Give #{missing.join(", ")}" if missing.any?
+      raise MissingArgumentError, "A call by name needs an account" if account.nil?
 
+      exposure = exposed(name) || raise(UnexposedMethodError, "#{exposing_hub} does not expose #{name}")
+      refuse_missing_values(exposure, values)
       public_send(exposure.name, **values.slice(*exposure.takes))
     end
 
@@ -31,6 +30,11 @@ module HubKernel
     def exposed_methods = @exposed_methods ||= {}
 
     def exposing_hub = name.demodulize
+
+    def refuse_missing_values(exposure, values)
+      missing = keywords(exposure, :keyreq) - values.keys
+      raise MissingArgumentError, "Give #{missing.join(", ")}" if missing.any?
+    end
 
     def exposure_problem(exposure)
       return "#{exposing_hub} exposes #{exposure.name}, which it has no method for" unless respond_to?(exposure.name)

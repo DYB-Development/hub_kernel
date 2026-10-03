@@ -35,7 +35,7 @@ module HubKernel
     end
 
     test "a call that names no account is refused before the method runs" do
-      assert_raises(HubKernel::MissingArgumentError, match: "A call by name needs a account") { Shop.call_exposed("price_of", values: { item: "soap" }, person: :sam, account: nil) }
+      assert_raises(HubKernel::MissingArgumentError, match: "A call by name needs an account") { Shop.call_exposed("price_of", values: { item: "soap" }, person: :sam, account: nil) }
     end
   end
 end
