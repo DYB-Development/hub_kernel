@@ -29,5 +29,9 @@ module HubKernel
     test "a value the method is not listed with is left out of the call" do
       assert_equal({ item: "soap" }, Shop.call_exposed("label", values: { item: "soap", colour: "red" }, person: :sam, account: :acme))
     end
+
+    test "a call that names no person is refused before the method runs" do
+      assert_raises(HubKernel::MissingArgumentError, match: "A call by name needs a person") { Shop.call_exposed("price_of", values: { item: "soap" }, person: nil, account: :acme) }
+    end
   end
 end

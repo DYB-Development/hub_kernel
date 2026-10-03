@@ -13,6 +13,7 @@ module HubKernel
     def exposed(name) = exposed_methods[name.to_s]
 
     def call_exposed(name, values:, person:, account:)
+      raise MissingArgumentError, "A call by name needs a person" if person.nil?
       exposure = exposed(name) || raise(UnexposedMethodError, "#{exposing_hub} does not expose #{name}")
       missing = keywords(exposure, :keyreq) - values.keys
       raise MissingArgumentError, "Give #{missing.join(", ")}" if missing.any?
