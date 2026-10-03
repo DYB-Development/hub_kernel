@@ -1,4 +1,6 @@
 module HubKernel
+  class UnexposedMethodError < StandardError; end
+
   module Exposes
     Exposed = Data.define(:name, :takes, :writes)
 
@@ -9,7 +11,8 @@ module HubKernel
     def exposed(name) = exposed_methods[name.to_s]
 
     def call_exposed(name, values:, person:, account:)
-      public_send(exposed(name).name, **values)
+      exposure = exposed(name) || raise(UnexposedMethodError, "#{exposing_hub} does not expose #{name}")
+      public_send(exposure.name, **values)
     end
 
     def exposure_problems
