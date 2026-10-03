@@ -2,6 +2,7 @@ require "hub_kernel/action"
 
 module HubKernel
   class UnexposedMethodError < StandardError; end
+  class Refused < StandardError; end
 
   module Exposes
     Exposed = Data.define(:name, :takes, :writes)
