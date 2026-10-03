@@ -17,5 +17,9 @@ module HubKernel
     test "calling a name the hub does not expose raises an error naming the hub and the name" do
       assert_raises(HubKernel::UnexposedMethodError, match: "Shop does not expose restock") { Shop.call_exposed("restock", values: {}, person: :sam, account: :acme) }
     end
+
+    test "a call missing a value the method requires raises the missing-value error naming it" do
+      assert_raises(HubKernel::MissingArgumentError, match: "Give item") { Shop.call_exposed("price_of", values: {}, person: :sam, account: :acme) }
+    end
   end
 end

@@ -1,3 +1,5 @@
+require "hub_kernel/action"
+
 module HubKernel
   class UnexposedMethodError < StandardError; end
 
@@ -12,6 +14,9 @@ module HubKernel
 
     def call_exposed(name, values:, person:, account:)
       exposure = exposed(name) || raise(UnexposedMethodError, "#{exposing_hub} does not expose #{name}")
+      missing = keywords(exposure, :keyreq) - values.keys
+      raise MissingArgumentError, "Give #{missing.join(", ")}" if missing.any?
+
       public_send(exposure.name, **values)
     end
 
