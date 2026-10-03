@@ -116,6 +116,20 @@ Supplies.exposed("record_purchase").takes # => [:supplier_id, :bought_on, :lines
 Supplies.exposed("delete_everything")     # => nil
 ```
 
+### Calling an exposed method by name
+An interface such as a JSON API calls a hub through its exposed list, by name, with the
+values a caller sent and the person and account the call is made for:
+
+```ruby
+Supplies.call_exposed("record_purchase", values: { supplier_id: 4, bought_on: "2026-10-01", lines: [] }, person: current_person, account: current_account)
+```
+
+It raises `HubKernel::UnexposedMethodError` for a name the hub does not expose,
+`HubKernel::MissingArgumentError` for a call with no person, no account, or a value the
+method requires, and passes on only the values the method is listed with. A hub raises
+`HubKernel::Refused` with a reason when it will not do what was asked, and the reason
+reaches the caller unchanged.
+
 ### The exposed-list check
 A hub's own test can check its exposed list, so a listed method the hub lacks, or one
 listed with values it does not take, shows in the suite rather than on a caller's
