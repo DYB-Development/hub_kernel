@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-10-04
+
 ### Added
 - `call_exposed(name, values:, person:, account:)` on a hub, which calls an exposed method by name with only the values it is listed with.
 - `HubKernel::UnexposedMethodError`, raised for a name a hub does not expose.
