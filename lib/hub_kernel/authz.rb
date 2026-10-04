@@ -2,6 +2,8 @@ module HubKernel
   class NonBooleanAnswerError < StandardError; end
 
   module Authz
+    singleton_class.attr_accessor :check
+
     module Vocabulary
       def gates(*actions)
         gated_actions.concat(actions)
