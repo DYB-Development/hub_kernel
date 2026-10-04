@@ -61,5 +61,11 @@ module HubKernel
 
       assert_empty crossings.in("app/models/shop/judgement.rb", "Shop::Hubs::Finance.balance")
     end
+
+    test "a file belongs to the map when a hub owns it" do
+      crossings = HubKernel::Crossings.new(owners: OWNERS)
+
+      assert_equal [ true, false ], [ crossings.belongs?("app/models/shop/purchase.rb"), crossings.belongs?("app/models/billing/invoice.rb") ]
+    end
   end
 end
