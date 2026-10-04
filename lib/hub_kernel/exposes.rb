@@ -23,7 +23,9 @@ module HubKernel
       refuse_unless_allowed(exposure, person, account)
       refuse_missing_values(exposure, values)
       call = -> { public_send(exposure.name, **values.slice(*exposure.takes)) }
-      Context.scope ? Context.scope.call(account, &call) : call.call
+      raise UnwiredPortError, "hub_kernel's account scope is not filled" unless Context.scope
+
+      Context.scope.call(account, &call)
     end
 
     def exposure_problems

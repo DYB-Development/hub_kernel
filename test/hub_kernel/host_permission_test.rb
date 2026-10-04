@@ -55,5 +55,11 @@ module HubKernel
 
       assert_raises(HubKernel::UnwiredPortError, match: "hub_kernel's permission check is not filled") { Shop.call_exposed("price_of", values: { item: "soap" }, person: :sam, account: :acme) }
     end
+
+    test "a call made while the account scope is unfilled raises an error naming it" do
+      HubKernel::Context.scope = nil
+
+      assert_raises(HubKernel::UnwiredPortError, match: "hub_kernel's account scope is not filled") { Shop.call_exposed("price_of", values: { item: "soap" }, person: :sam, account: :acme) }
+    end
   end
 end
