@@ -14,6 +14,8 @@ module HubKernel
       source.scan(/[A-Z]\w*(?:::[A-Z]\w*)*/).filter_map { |name| owned_class_in(name) }.uniq.select { |name| crossing?(name, hub) }
     end
 
+    def belongs?(path) = !owner_of_file(path).nil?
+
     private
 
     def crossing?(name, hub)
