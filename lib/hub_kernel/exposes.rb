@@ -1,5 +1,6 @@
 require "hub_kernel/action"
 require "hub_kernel/authz"
+require "hub_kernel/context"
 
 module HubKernel
   class UnexposedMethodError < StandardError; end
@@ -21,7 +22,8 @@ module HubKernel
       exposure = exposed(name) || raise(UnexposedMethodError, "#{exposing_hub} does not expose #{name}")
       refuse_unless_allowed(exposure, person, account)
       refuse_missing_values(exposure, values)
-      public_send(exposure.name, **values.slice(*exposure.takes))
+      call = -> { public_send(exposure.name, **values.slice(*exposure.takes)) }
+      Context.scope ? Context.scope.call(account, &call) : call.call
     end
 
     def exposure_problems
