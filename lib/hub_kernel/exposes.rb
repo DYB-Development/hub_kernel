@@ -19,7 +19,7 @@ module HubKernel
       raise MissingArgumentError, "A call by name needs an account" if account.nil?
 
       exposure = exposed(name) || raise(UnexposedMethodError, "#{exposing_hub} does not expose #{name}")
-      raise NotAllowed, "#{exposing_hub} #{exposure.name}" if Authz.check && !Authz.check.call(person, "#{exposing_hub.underscore}:#{exposure.name}", account)
+      refuse_unless_allowed(exposure, person, account)
       refuse_missing_values(exposure, values)
       public_send(exposure.name, **values.slice(*exposure.takes))
     end
@@ -33,6 +33,14 @@ module HubKernel
     def exposed_methods = @exposed_methods ||= {}
 
     def exposing_hub = name.demodulize
+
+    def refuse_unless_allowed(exposure, person, account)
+      return unless Authz.check
+
+      answer = Authz.check.call(person, "#{exposing_hub.underscore}:#{exposure.name}", account)
+      raise NonBooleanAnswerError, "The permission check must answer true or false, got #{answer.inspect}" unless [ true, false ].include?(answer)
+      raise NotAllowed, "#{exposing_hub} #{exposure.name}" unless answer
+    end
 
     def refuse_missing_values(exposure, values)
       missing = keywords(exposure, :keyreq) - values.keys

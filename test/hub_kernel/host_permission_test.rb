@@ -27,5 +27,11 @@ module HubKernel
 
       assert_raises(HubKernel::NotAllowed) { Shop.call_exposed("price_of", values: { item: "soap" }, person: :sam, account: :acme) }
     end
+
+    test "the host's permission check returning neither true nor false raises the non-boolean answer error" do
+      HubKernel::Authz.check = ->(*) { :maybe }
+
+      assert_raises(HubKernel::NonBooleanAnswerError) { Shop.call_exposed("price_of", values: { item: "soap" }, person: :sam, account: :acme) }
+    end
   end
 end
