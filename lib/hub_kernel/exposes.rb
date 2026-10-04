@@ -37,7 +37,7 @@ module HubKernel
     def exposing_hub = name.demodulize
 
     def refuse_unless_allowed(exposure, person, account)
-      return unless Authz.check
+      raise UnwiredPortError, "hub_kernel's permission check is not filled" unless Authz.check
 
       answer = Authz.check.call(person, "#{exposing_hub.underscore}:#{exposure.name}", account)
       raise NonBooleanAnswerError, "The permission check must answer true or false, got #{answer.inspect}" unless [ true, false ].include?(answer)

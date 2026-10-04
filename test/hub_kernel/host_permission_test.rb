@@ -49,5 +49,11 @@ module HubKernel
 
       assert_equal :acme, Shop.call_exposed("whose_shelf", values: {}, person: :sam, account: :acme)
     end
+
+    test "a call made while the permission check is unfilled raises an error naming it" do
+      HubKernel::Authz.check = nil
+
+      assert_raises(HubKernel::UnwiredPortError, match: "hub_kernel's permission check is not filled") { Shop.call_exposed("price_of", values: { item: "soap" }, person: :sam, account: :acme) }
+    end
   end
 end
