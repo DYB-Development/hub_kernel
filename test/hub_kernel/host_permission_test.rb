@@ -16,7 +16,11 @@ module HubKernel
       def self.whose_shelf = scoped_to
     end
 
-    setup { @check, @scope = HubKernel::Authz.check, HubKernel::Context.scope }
+    setup do
+      @check, @scope = HubKernel::Authz.check, HubKernel::Context.scope
+      HubKernel::Authz.check = ->(*) { true }
+      HubKernel::Context.scope = ->(_account, &call) { call.call }
+    end
     teardown { HubKernel::Authz.check, HubKernel::Context.scope = @check, @scope }
 
     test "the host's permission check is asked with the person, the hub's action and the account" do

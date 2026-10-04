@@ -18,6 +18,15 @@ module HubKernel
       def self.restock(item:) = raise(HubKernel::Refused, "The #{item} shelf is full")
     end
 
+
+    setup do
+      @check, @scope = HubKernel::Authz.check, HubKernel::Context.scope
+      HubKernel::Authz.check = ->(*) { true }
+      HubKernel::Context.scope = ->(_account, &call) { call.call }
+    end
+
+    teardown { HubKernel::Authz.check, HubKernel::Context.scope = @check, @scope }
+
     test "calling an exposed method by name runs it and returns its answer" do
       assert_equal "soap costs 3", Shop.call_exposed("price_of", values: { item: "soap" }, person: :sam, account: :acme)
     end
