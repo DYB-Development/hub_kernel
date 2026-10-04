@@ -177,6 +177,9 @@ end
   record its folder is named after, and otherwise to the `host_layer`.
 - The host's layer may name any hub's interface module, and a hub naming another hub's
   interface module is a crossing.
+- The test fails with "The crossing check found no files to read" when none of the files
+  it read belongs to a hub or the host's layer, so a wrong `files:` pattern or an empty
+  map does not pass unnoticed.
 
 ## Installation
 Add this line to your application's Gemfile:

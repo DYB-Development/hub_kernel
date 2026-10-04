@@ -6,6 +6,11 @@
 - `call_exposed(name, values:, person:, account:)` on a hub, which calls an exposed method by name with only the values it is listed with.
 - `HubKernel::UnexposedMethodError`, raised for a name a hub does not expose.
 - `HubKernel::Refused`, which a hub raises with a reason when it will not do what was asked.
+- `belongs?(path)` on `HubKernel::Crossings`, which says whether a file belongs to a hub or the host's layer.
+
+### Fixed
+- The crossing check fails with "The crossing check found no files to read" when none of the files it read belongs to the map.
+- A clean crossing check counts as an assertion, so it no longer warns that the test is missing assertions.
 
 ## [0.10.0] - 2026-10-02
 
