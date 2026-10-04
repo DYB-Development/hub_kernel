@@ -61,5 +61,11 @@ module HubKernel
 
       assert_raises(HubKernel::UnwiredPortError, match: "hub_kernel's account scope is not filled") { Shop.call_exposed("price_of", values: { item: "soap" }, person: :sam, account: :acme) }
     end
+
+    test "a refused call is refused before its missing values are checked" do
+      HubKernel::Authz.check = ->(*) { false }
+
+      assert_raises(HubKernel::NotAllowed) { Shop.call_exposed("price_of", values: {}, person: :sam, account: :acme) }
+    end
   end
 end
