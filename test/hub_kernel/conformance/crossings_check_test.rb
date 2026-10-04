@@ -39,6 +39,14 @@ module HubKernel
         end
       end
 
+      test "a clean crossing check counts as an assertion" do
+        Dir.mktmpdir do |root|
+          write(root, "app/models/shop/purchase.rb", "Shop::Purchase.where(name: name)")
+
+          assert_equal 1, crossing_check_run(root).assertions
+        end
+      end
+
       private
 
       def write(root, path, source)
@@ -46,11 +54,13 @@ module HubKernel
         File.write(File.join(root, path), source)
       end
 
-      def crossing_check_failure(root, **options)
+      def crossing_check_failure(root, **options) = crossing_check_run(root, **options).failures.first&.message
+
+      def crossing_check_run(root, **options)
         check = Class.new(ActiveSupport::TestCase) { include HubKernel::Conformance::Crossings }
         Minitest::Runnable.runnables.delete(check)
         check.crossings(root: root, **options) { HubKernel::Crossings.new(owners: OWNERS) }
-        check.runnable_methods.filter_map { |name| check.new(name).run.failures.first&.message }.first
+        check.new(check.runnable_methods.first).run
       end
     end
   end
