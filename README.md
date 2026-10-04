@@ -130,6 +130,22 @@ method requires, and passes on only the values the method is listed with. A hub 
 `HubKernel::Refused` with a reason when it will not do what was asked, and the reason
 reaches the caller unchanged.
 
+### The host's permission check and account scope
+Every call by name asks the host whether the person may take the action on the account,
+and runs the method inside the host's scope for that account. The host sets both once
+for the whole app:
+
+```ruby
+HubKernel::Authz.check = ->(person, action, account) { Permissions.allow?(person, action, account) }
+HubKernel::Context.scope = ->(account, &call) { Current.set(account: account, &call) }
+```
+
+The action is named after the hub and the method, such as `supplies:record_purchase`. A
+refused call raises `HubKernel::NotAllowed` before the method runs or its values are
+checked, and a check that answers anything but true or false raises
+`HubKernel::NonBooleanAnswerError`. A call made while either is unset raises
+`HubKernel::UnwiredPortError` naming it.
+
 ### The exposed-list check
 A hub's own test can check its exposed list, so a listed method the hub lacks, or one
 listed with values it does not take, shows in the suite rather than on a caller's
