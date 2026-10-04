@@ -19,7 +19,7 @@ module HubKernel
       raise MissingArgumentError, "A call by name needs an account" if account.nil?
 
       exposure = exposed(name) || raise(UnexposedMethodError, "#{exposing_hub} does not expose #{name}")
-      Authz.check&.call(person, "#{exposing_hub.underscore}:#{exposure.name}", account)
+      raise NotAllowed, "#{exposing_hub} #{exposure.name}" if Authz.check && !Authz.check.call(person, "#{exposing_hub.underscore}:#{exposure.name}", account)
       refuse_missing_values(exposure, values)
       public_send(exposure.name, **values.slice(*exposure.takes))
     end

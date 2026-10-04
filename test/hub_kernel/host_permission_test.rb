@@ -21,5 +21,11 @@ module HubKernel
 
       assert_equal [ [ :sam, "shop:price_of", :acme ] ], asked
     end
+
+    test "a call the host's permission check refuses raises the not-allowed error" do
+      HubKernel::Authz.check = ->(*) { false }
+
+      assert_raises(HubKernel::NotAllowed) { Shop.call_exposed("price_of", values: { item: "soap" }, person: :sam, account: :acme) }
+    end
   end
 end
