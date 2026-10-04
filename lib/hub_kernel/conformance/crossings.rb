@@ -17,10 +17,13 @@ module HubKernel
 
       included do
         test "no file names a class another hub owns" do
-          found = (Dir.glob(crossing_files, base: crossing_root) - crossing_exceptions).sort.flat_map do |path|
+          paths = (Dir.glob(crossing_files, base: crossing_root) - crossing_exceptions).sort
+          flunk "The crossing check found no files to read" if paths.none? { |path| the_crossings.belongs?(path) }
+
+          found = paths.flat_map do |path|
             the_crossings.in(path, File.read(File.join(crossing_root, path))).map { |name| "#{path} names #{name}" }
           end
-          flunk found.join("\n") if found.any?
+          assert found.empty?, found.join("\n")
         end
       end
     end
