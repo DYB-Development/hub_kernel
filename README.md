@@ -199,6 +199,9 @@ end
 - It also fails naming each class defined in the files it reads that no hub owns, such as
   "No hub owns Shop::Refund", and each class the map gives to two hubs, such as "Two hubs
   own Shop::Receipt".
+- It fails naming each class the map names that no longer exists in the app, such as "The
+  map names Shop::Ghost, which does not exist", so a renamed or removed class does not
+  stay in the map.
 
 ## Installation
 Add this line to your application's Gemfile:
