@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-10-05
+
+### Added
+- A `namespaces:` option on `HubKernel::Crossings`, which gives a hub every class under a namespace. A class listed by name in `owners` wins over another hub's namespace.
+
 ## [0.13.0] - 2026-10-05
 
 ### Added
