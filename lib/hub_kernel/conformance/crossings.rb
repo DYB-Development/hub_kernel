@@ -34,6 +34,11 @@ module HubKernel
           twice = the_crossings.claimed_twice
           assert twice.empty?, twice.map { |name| "Two hubs own #{name}" }.join("\n")
         end
+
+        test "every class the map names exists" do
+          missing = the_crossings.missing_classes
+          assert missing.empty?, missing.map { |name| "The map names #{name}, which does not exist" }.join("\n")
+        end
       end
 
       def crossing_paths = (Dir.glob(crossing_files, base: crossing_root) - crossing_exceptions).sort

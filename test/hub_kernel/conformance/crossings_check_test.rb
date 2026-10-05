@@ -74,6 +74,14 @@ module HubKernel
         end
       end
 
+      test "the crossing check fails and names each class the map names that does not exist" do
+        Dir.mktmpdir do |root|
+          owners = { supplies: %w[HubKernel::Crossings Shop::Ghost] }
+
+          assert_equal "The map names Shop::Ghost, which does not exist", crossing_check_failure(root, test: "every class the map names exists", owners: owners)
+        end
+      end
+
       private
 
       def write(root, path, source)

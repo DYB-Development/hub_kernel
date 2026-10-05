@@ -80,5 +80,11 @@ module HubKernel
 
       assert_equal [ "Shop::Receipt" ], crossings.claimed_twice
     end
+
+    test "a class the map names that does not exist is named" do
+      crossings = HubKernel::Crossings.new(owners: { supplies: %w[HubKernel::Crossings Shop::Ghost] })
+
+      assert_equal [ "Shop::Ghost" ], crossings.missing_classes
+    end
   end
 end

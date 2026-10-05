@@ -22,6 +22,8 @@ module HubKernel
 
     def claimed_twice = @owners.values.flatten.tally.select { |_name, hubs| hubs > 1 }.keys
 
+    def missing_classes = @owners.values.flatten.uniq.reject(&:safe_constantize)
+
     private
 
     def class_of(path) = path.sub(%r{\Aapp/[^/]+/}, "").delete_suffix(".rb").camelize
