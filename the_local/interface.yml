@@ -1,0 +1,42 @@
+scope: hubs — a domain gem declares the ports it needs and the methods it exposes, and the host app fills those ports and checks each hub is wired and crosses into no other hub
+
+install:
+  - gem "hub_kernel"
+  - HubKernel::Hubs.check!
+  - HubKernel::Hubs.list
+  - HubKernel::UnwiredPortError
+  - HubKernel::Authz.check
+  - HubKernel::Context.scope
+  - HubKernel::Conformance::Hub
+  - HubKernel::Crossings
+  - HubKernel::Conformance::Crossings
+
+develop:
+  - bin/rails generate hub_kernel:hub
+  - HubKernel::Ports
+  - port
+  - HubKernel::Exposes
+  - exposes
+  - exposed
+  - call_exposed
+  - HubKernel::Refused
+  - HubKernel::UnexposedMethodError
+  - HubKernel::MissingArgumentError
+  - HubKernel::NotAllowed
+  - HubKernel::NonBooleanAnswerError
+  - HubKernel::Conformance::Exposed
+
+sources:
+  - lib/hub_kernel.rb
+  - lib/hub_kernel/ports.rb
+  - lib/hub_kernel/hubs.rb
+  - lib/hub_kernel/exposes.rb
+  - lib/hub_kernel/action.rb
+  - lib/hub_kernel/authz.rb
+  - lib/hub_kernel/context.rb
+  - lib/hub_kernel/crossings.rb
+  - lib/hub_kernel/conformance/hub.rb
+  - lib/hub_kernel/conformance/exposed.rb
+  - lib/hub_kernel/conformance/crossings.rb
+  - lib/generators/hub_kernel/hub/hub_generator.rb
+  - README.md
