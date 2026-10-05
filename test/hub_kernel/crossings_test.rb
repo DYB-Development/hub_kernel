@@ -92,5 +92,11 @@ module HubKernel
 
       assert_equal [ "Billing::Invoice" ], crossings.in("app/models/shop/purchase.rb", "Billing::Invoice.create!(amount: 5)")
     end
+
+    test "a file under a hub's namespace belongs to that hub" do
+      crossings = HubKernel::Crossings.new(owners: OWNERS, namespaces: { billing: %w[Billing] })
+
+      assert_empty crossings.in("app/models/billing/invoice.rb", "Billing::Payment.where(invoice: self)")
+    end
   end
 end
