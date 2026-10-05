@@ -74,5 +74,11 @@ module HubKernel
 
       assert_equal [ "Shop::Refund" ], crossings.unowned_classes(paths)
     end
+
+    test "a class the map gives to two hubs is named" do
+      crossings = HubKernel::Crossings.new(owners: { supplies: %w[Shop::Purchase Shop::Receipt], finance: %w[Shop::Expense Shop::Receipt] })
+
+      assert_equal [ "Shop::Receipt" ], crossings.claimed_twice
+    end
   end
 end

@@ -20,6 +20,8 @@ module HubKernel
       paths.select { |path| path.end_with?(".rb") && !path.start_with?("app/views/") }.map { |path| class_of(path) }.reject { |name| owner_of(name) }
     end
 
+    def claimed_twice = @owners.values.flatten.tally.select { |_name, hubs| hubs > 1 }.keys
+
     private
 
     def class_of(path) = path.sub(%r{\Aapp/[^/]+/}, "").delete_suffix(".rb").camelize
