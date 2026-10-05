@@ -98,5 +98,11 @@ module HubKernel
 
       assert_empty crossings.in("app/models/billing/invoice.rb", "Billing::Payment.where(invoice: self)")
     end
+
+    test "a class listed by name belongs to its hub even under another hub's namespace" do
+      crossings = HubKernel::Crossings.new(owners: { supplies: %w[Shop::Purchase Billing::Refund] }, namespaces: { billing: %w[Billing] })
+
+      assert_equal [ "Billing::Refund" ], crossings.in("app/models/billing/invoice.rb", "Billing::Refund.for(self)")
+    end
   end
 end
