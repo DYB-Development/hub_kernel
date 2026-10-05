@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-10-05
+
+### Added
+- `missing_classes` on `HubKernel::Crossings`, naming each class the map names that does not resolve to a constant.
+- The crossing check fails naming each class the map names that does not exist in the app.
+
 ## [0.12.0] - 2026-10-04
 
 ### Added
