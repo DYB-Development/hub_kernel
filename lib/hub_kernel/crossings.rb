@@ -37,10 +37,18 @@ module HubKernel
 
     def owned_class_in(name)
       parts = name.split("::")
-      parts.size.downto(1).map { |size| parts.first(size).join("::") }.find { |candidate| owner_of(candidate) }
+      listed = parts.size.downto(1).map { |size| parts.first(size).join("::") }.find { |candidate| listed_owner_of(candidate) }
+      listed || class_under_namespace(name)
     end
 
-    def owner_of(class_name) = @interfaces.key(class_name) || @owners.find { |_hub, classes| classes.include?(class_name) }&.first || owner_of_namespace(class_name)
+    def class_under_namespace(name)
+      space = @namespaces.values.flatten.find { |namespace| name.start_with?("#{namespace}::") }
+      space && "#{space}::#{name.delete_prefix("#{space}::").split("::").first}"
+    end
+
+    def listed_owner_of(class_name) = @interfaces.key(class_name) || @owners.find { |_hub, classes| classes.include?(class_name) }&.first
+
+    def owner_of(class_name) = listed_owner_of(class_name) || owner_of_namespace(class_name)
 
     def owner_of_namespace(class_name) = @namespaces.find { |_hub, spaces| spaces.any? { |space| class_name.start_with?("#{space}::") } }&.first
 

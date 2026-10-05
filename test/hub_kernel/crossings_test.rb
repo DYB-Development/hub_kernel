@@ -104,5 +104,11 @@ module HubKernel
 
       assert_equal [ "Billing::Refund" ], crossings.in("app/models/billing/invoice.rb", "Billing::Refund.for(self)")
     end
+
+    test "naming a constant inside a class under another hub's namespace names that class" do
+      crossings = HubKernel::Crossings.new(owners: OWNERS, namespaces: { billing: %w[Billing] })
+
+      assert_equal [ "Billing::Invoice" ], crossings.in("app/models/shop/purchase.rb", "Billing::Invoice::KINDS.first")
+    end
   end
 end
