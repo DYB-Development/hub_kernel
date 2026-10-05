@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-10-04
+
+### Added
+- `unowned_classes(paths)` and `claimed_twice` on `HubKernel::Crossings`.
+- The crossing check fails naming each class defined in the files it reads that no hub owns, and each class the map gives to two hubs.
+
 ## [0.11.0] - 2026-10-04
 
 ### Added

@@ -57,6 +57,23 @@ module HubKernel
         end
       end
 
+      test "the crossing check fails and names each class it read that no hub owns" do
+        Dir.mktmpdir do |root|
+          write(root, "app/models/shop/purchase.rb", "Shop::Purchase.where(name: name)")
+          write(root, "app/models/shop/refund.rb", "class Shop::Refund; end")
+
+          assert_equal "No hub owns Shop::Refund", crossing_check_failure(root, test: "every class it reads belongs to a hub")
+        end
+      end
+
+      test "the crossing check fails and names each class the map gives to two hubs" do
+        Dir.mktmpdir do |root|
+          owners = { supplies: %w[Shop::Purchase Shop::Receipt], finance: %w[Shop::Expense Shop::Receipt] }
+
+          assert_equal "Two hubs own Shop::Receipt", crossing_check_failure(root, test: "no class belongs to two hubs", owners: owners)
+        end
+      end
+
       private
 
       def write(root, path, source)
@@ -66,11 +83,11 @@ module HubKernel
 
       def crossing_check_failure(root, **options) = crossing_check_run(root, **options).failures.first&.message
 
-      def crossing_check_run(root, **options)
+      def crossing_check_run(root, test: "no file names a class another hub owns", owners: OWNERS, **options)
         check = Class.new(ActiveSupport::TestCase) { include HubKernel::Conformance::Crossings }
         Minitest::Runnable.runnables.delete(check)
-        check.crossings(root: root, **options) { HubKernel::Crossings.new(owners: OWNERS) }
-        check.new(check.runnable_methods.first).run
+        check.crossings(root: root, **options) { HubKernel::Crossings.new(owners: owners) }
+        check.new("test_#{test.tr(" ", "_")}").run
       end
     end
   end

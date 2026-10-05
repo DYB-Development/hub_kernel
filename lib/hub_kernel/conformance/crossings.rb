@@ -17,15 +17,26 @@ module HubKernel
 
       included do
         test "no file names a class another hub owns" do
-          paths = (Dir.glob(crossing_files, base: crossing_root) - crossing_exceptions).sort
-          flunk "The crossing check found no files to read" if paths.none? { |path| the_crossings.belongs?(path) }
+          flunk "The crossing check found no files to read" if crossing_paths.none? { |path| the_crossings.belongs?(path) }
 
-          found = paths.flat_map do |path|
+          found = crossing_paths.flat_map do |path|
             the_crossings.in(path, File.read(File.join(crossing_root, path))).map { |name| "#{path} names #{name}" }
           end
           assert found.empty?, found.join("\n")
         end
+
+        test "every class it reads belongs to a hub" do
+          unowned = the_crossings.unowned_classes(crossing_paths)
+          assert unowned.empty?, unowned.map { |name| "No hub owns #{name}" }.join("\n")
+        end
+
+        test "no class belongs to two hubs" do
+          twice = the_crossings.claimed_twice
+          assert twice.empty?, twice.map { |name| "Two hubs own #{name}" }.join("\n")
+        end
       end
+
+      def crossing_paths = (Dir.glob(crossing_files, base: crossing_root) - crossing_exceptions).sort
     end
   end
 end

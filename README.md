@@ -196,6 +196,9 @@ end
 - The test fails with "The crossing check found no files to read" when none of the files
   it read belongs to a hub or the host's layer, so a wrong `files:` pattern or an empty
   map does not pass unnoticed.
+- It also fails naming each class defined in the files it reads that no hub owns, such as
+  "No hub owns Shop::Refund", and each class the map gives to two hubs, such as "Two hubs
+  own Shop::Receipt".
 
 ## Installation
 Add this line to your application's Gemfile:

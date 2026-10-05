@@ -67,5 +67,18 @@ module HubKernel
 
       assert_equal [ true, false ], [ crossings.belongs?("app/models/shop/purchase.rb"), crossings.belongs?("app/models/billing/invoice.rb") ]
     end
+
+    test "the classes no hub owns are named from the files given" do
+      crossings = HubKernel::Crossings.new(owners: OWNERS)
+      paths = [ "app/models/shop/purchase.rb", "app/models/shop/refund.rb", "app/views/shop/refunds/index.html.erb" ]
+
+      assert_equal [ "Shop::Refund" ], crossings.unowned_classes(paths)
+    end
+
+    test "a class the map gives to two hubs is named" do
+      crossings = HubKernel::Crossings.new(owners: { supplies: %w[Shop::Purchase Shop::Receipt], finance: %w[Shop::Expense Shop::Receipt] })
+
+      assert_equal [ "Shop::Receipt" ], crossings.claimed_twice
+    end
   end
 end

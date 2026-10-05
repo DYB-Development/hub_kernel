@@ -16,7 +16,15 @@ module HubKernel
 
     def belongs?(path) = !owner_of_file(path).nil?
 
+    def unowned_classes(paths)
+      paths.select { |path| path.end_with?(".rb") && !path.start_with?("app/views/") }.map { |path| class_of(path) }.reject { |name| owner_of(name) }
+    end
+
+    def claimed_twice = @owners.values.flatten.tally.select { |_name, hubs| hubs > 1 }.keys
+
     private
+
+    def class_of(path) = path.sub(%r{\Aapp/[^/]+/}, "").delete_suffix(".rb").camelize
 
     def crossing?(name, hub)
       return false if @shared.include?(name) || owner_of(name) == hub
@@ -34,7 +42,7 @@ module HubKernel
     def owner_of_file(path)
       return owner_of_view_folder(File.dirname(path.delete_prefix("app/views/")).camelize) if path.start_with?("app/views/")
 
-      owner_of(path.sub(%r{\Aapp/[^/]+/}, "").delete_suffix(".rb").camelize)
+      owner_of(class_of(path))
     end
 
     def owner_of_view_folder(folder) = owner_of("#{folder}Controller") || owner_of(folder) || @host_layer
