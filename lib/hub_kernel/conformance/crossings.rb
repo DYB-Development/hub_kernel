@@ -29,6 +29,11 @@ module HubKernel
           unowned = the_crossings.unowned_classes(crossing_paths)
           assert unowned.empty?, unowned.map { |name| "No hub owns #{name}" }.join("\n")
         end
+
+        test "no class belongs to two hubs" do
+          twice = the_crossings.claimed_twice
+          assert twice.empty?, twice.map { |name| "Two hubs own #{name}" }.join("\n")
+        end
       end
 
       def crossing_paths = (Dir.glob(crossing_files, base: crossing_root) - crossing_exceptions).sort
