@@ -1,4 +1,7 @@
 require "hub_kernel/action"
+require "hub_kernel/authz"
+require "hub_kernel/context"
+require "hub_kernel/ports"
 
 module HubKernel
   class UnexposedMethodError < StandardError; end
@@ -18,8 +21,9 @@ module HubKernel
       raise MissingArgumentError, "A call by name needs an account" if account.nil?
 
       exposure = exposed(name) || raise(UnexposedMethodError, "#{exposing_hub} does not expose #{name}")
+      refuse_unless_allowed(exposure, person, account)
       refuse_missing_values(exposure, values)
-      public_send(exposure.name, **values.slice(*exposure.takes))
+      within_account(account) { public_send(exposure.name, **values.slice(*exposure.takes)) }
     end
 
     def exposure_problems
@@ -31,6 +35,20 @@ module HubKernel
     def exposed_methods = @exposed_methods ||= {}
 
     def exposing_hub = name.demodulize
+
+    def refuse_unless_allowed(exposure, person, account)
+      raise UnwiredPortError, "hub_kernel's permission check is not filled" unless Authz.check
+
+      answer = Authz.check.call(person, "#{exposing_hub.underscore}:#{exposure.name}", account)
+      raise NonBooleanAnswerError, "The permission check must answer true or false, got #{answer.inspect}" unless [ true, false ].include?(answer)
+      raise NotAllowed, "#{exposing_hub} #{exposure.name}" unless answer
+    end
+
+    def within_account(account, &call)
+      raise UnwiredPortError, "hub_kernel's account scope is not filled" unless Context.scope
+
+      Context.scope.call(account, &call)
+    end
 
     def refuse_missing_values(exposure, values)
       missing = keywords(exposure, :keyreq) - values.keys

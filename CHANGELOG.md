@@ -2,10 +2,14 @@
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-10-04
+
 ### Added
 - `call_exposed(name, values:, person:, account:)` on a hub, which calls an exposed method by name with only the values it is listed with.
 - `HubKernel::UnexposedMethodError`, raised for a name a hub does not expose.
 - `HubKernel::Refused`, which a hub raises with a reason when it will not do what was asked.
+- `HubKernel::Authz.check`, which every call by name asks with the person, the action and the account, raising `HubKernel::NotAllowed` when it refuses.
+- `HubKernel::Context.scope`, which every permitted call by name runs inside for the account it names.
 - `belongs?(path)` on `HubKernel::Crossings`, which says whether a file belongs to a hub or the host's layer.
 
 ### Fixed
