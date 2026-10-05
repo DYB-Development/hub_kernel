@@ -180,7 +180,8 @@ class HubCrossingsTest < ActiveSupport::TestCase
       owners: { supplies: %w[Shop::Purchase Shop::PurchasesController], finance: %w[Shop::Expense], shop: %w[Shop::Home] },
       shared: %w[Shop::BaseController],
       host_layer: :shop,
-      interfaces: { supplies: "Shop::Hubs::Supplies", finance: "Shop::Hubs::Finance" }
+      interfaces: { supplies: "Shop::Hubs::Supplies", finance: "Shop::Hubs::Finance" },
+      namespaces: { billing: %w[Billing] }
     )
   end
 end
@@ -189,6 +190,9 @@ end
 - A constant inside another hub's class counts as naming that class.
 - A name no hub owns, such as a namespace, is not a crossing, and neither is a class on
   the `shared` list.
+- `namespaces` gives a hub every class under a namespace, such as a hub gem's `Billing`,
+  so its classes need not be listed one by one. A class listed by name in `owners`
+  belongs to its listed hub even under another hub's namespace.
 - A view belongs to the hub that owns its controller, then to the hub that owns the
   record its folder is named after, and otherwise to the `host_layer`.
 - The host's layer may name any hub's interface module, and a hub naming another hub's

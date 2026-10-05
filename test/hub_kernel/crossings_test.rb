@@ -86,5 +86,29 @@ module HubKernel
 
       assert_equal [ "Shop::Ghost" ], crossings.missing_classes
     end
+
+    test "naming a class under another hub's namespace is a crossing" do
+      crossings = HubKernel::Crossings.new(owners: OWNERS, namespaces: { billing: %w[Billing] })
+
+      assert_equal [ "Billing::Invoice" ], crossings.in("app/models/shop/purchase.rb", "Billing::Invoice.create!(amount: 5)")
+    end
+
+    test "a file under a hub's namespace belongs to that hub" do
+      crossings = HubKernel::Crossings.new(owners: OWNERS, namespaces: { billing: %w[Billing] })
+
+      assert_empty crossings.in("app/models/billing/invoice.rb", "Billing::Payment.where(invoice: self)")
+    end
+
+    test "a class listed by name belongs to its hub even under another hub's namespace" do
+      crossings = HubKernel::Crossings.new(owners: { supplies: %w[Shop::Purchase Billing::Refund] }, namespaces: { billing: %w[Billing] })
+
+      assert_equal [ "Billing::Refund" ], crossings.in("app/models/billing/invoice.rb", "Billing::Refund.for(self)")
+    end
+
+    test "naming a constant inside a class under another hub's namespace names that class" do
+      crossings = HubKernel::Crossings.new(owners: OWNERS, namespaces: { billing: %w[Billing] })
+
+      assert_equal [ "Billing::Invoice" ], crossings.in("app/models/shop/purchase.rb", "Billing::Invoice::KINDS.first")
+    end
   end
 end
