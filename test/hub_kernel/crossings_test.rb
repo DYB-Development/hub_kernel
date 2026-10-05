@@ -86,5 +86,11 @@ module HubKernel
 
       assert_equal [ "Shop::Ghost" ], crossings.missing_classes
     end
+
+    test "naming a class under another hub's namespace is a crossing" do
+      crossings = HubKernel::Crossings.new(owners: OWNERS, namespaces: { billing: %w[Billing] })
+
+      assert_equal [ "Billing::Invoice" ], crossings.in("app/models/shop/purchase.rb", "Billing::Invoice.create!(amount: 5)")
+    end
   end
 end
