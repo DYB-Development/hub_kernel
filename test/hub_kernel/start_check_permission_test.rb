@@ -40,5 +40,12 @@ module HubKernel
 
       assert_equal [ "Pantry" ], HubKernel::Hubs.list.map(&:name)
     end
+
+    test "an app whose hubs expose nothing starts without the permission check or the account scope" do
+      HubKernel::Hubs.list.replace([ Module.new { extend HubKernel::Exposes } ])
+      HubKernel::Authz.check, HubKernel::Context.scope = nil, nil
+
+      assert_nothing_raised { HubKernel::Hubs.check! }
+    end
   end
 end
