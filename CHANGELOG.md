@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [0.17.0] - 2026-10-06
+
+### Added
+- The start check names the permission check or the account scope when either is unset or cannot be called while any hub exposes a method.
+- A hub that exposes a method is on `HubKernel::Hubs.list`, as a hub that declares a port is.
+
 ## [0.16.0] - 2026-10-05
 
 ### Added
