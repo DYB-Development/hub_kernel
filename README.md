@@ -68,7 +68,7 @@ app left unfilled raises `HubKernel::UnwiredPortError`, such as "Supplies' spend
 recorder is not wired".
 
 ### The start check
-Every hub that declares a port is on `HubKernel::Hubs.list`. Call
+Every hub that declares a port or exposes a method is on `HubKernel::Hubs.list`. Call
 `HubKernel::Hubs.check!` after the app fills its ports, and the app refuses to start
 while any port is unfilled:
 
@@ -82,6 +82,10 @@ end
 It raises `HubKernel::UnwiredPortError` naming every unfilled port with its hub, one per
 line. Running it inside `to_prepare` checks again after every code reload, and a hub
 declared again on a reload stays on the list once.
+
+While any hub exposes a method, it also names the permission check or the account scope
+when either is unset or set to something that cannot be called. An app whose hubs expose
+nothing starts without either.
 
 ### The hub check
 A hub's own test can check that the app filled every one of its ports, so a missing

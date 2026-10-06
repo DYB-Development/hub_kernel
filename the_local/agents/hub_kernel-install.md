@@ -12,8 +12,8 @@ hub_kernel lets a Rails host app fill the ports each hub declares, refuse to sta
 
 ## Interface
 - `gem "hub_kernel"` — the Gemfile line that adds the gem to the host app.
-- `HubKernel::Hubs.check!` — raises `HubKernel::UnwiredPortError` naming every unfilled port of every loaded hub, one per line, such as "Supplies' spend recorder is not wired".
-- `HubKernel::Hubs.list` — the hubs that have loaded and declared at least one port.
+- `HubKernel::Hubs.check!` — raises `HubKernel::UnwiredPortError` naming every unfilled port of every loaded hub, one per line, such as "Supplies' spend recorder is not wired", and, while any loaded hub exposes a method, the permission check or the account scope when either is unset or cannot be called.
+- `HubKernel::Hubs.list` — the hubs that have loaded and declared at least one port or exposed at least one method.
 - `HubKernel::UnwiredPortError` — raised by the start check, by calling an unfilled port, by a call by name while the permission check or the account scope is unset, and by listing what a person may call from a hub that exposes at least one method while the permission check is unset.
 - `HubKernel::Authz.check` — the host-wide permission rule, a callable taking a person, an action and an account and answering `true` or `false`.
 - `HubKernel::Context.scope` — the host-wide account scope, a callable taking an account and a block and running the block inside that account.
@@ -42,15 +42,20 @@ hub_kernel lets a Rails host app fill the ports each hub declares, refuse to sta
 
    A port accepts any object that responds to `call`. The start check only sees hubs that have loaded, so name every hub in this block. Run `HubKernel::Hubs.list` in `bin/rails console` to see which hubs it saw.
 
-4. Ask the developer whether any interface, such as a JSON API, calls hub methods by name or lists which of a hub's exposed methods a person may call. If neither, skip to step 6.
+4. Run `bin/rails runner 'HubKernel::Hubs.check!'`. If the error names "hub_kernel's permission check" or "hub_kernel's account scope", a loaded hub exposes a method and step 5 is required. If it names neither, skip to step 6.
 
-5. Ask the developer for the app's permission rule and the account scope, since neither has a default. Set both once, in the same initializer:
+5. Ask the developer for the app's permission rule and the account scope, since neither has a default. Set both in the same `to_prepare` block, before the start check:
 
    ```ruby
-   HubKernel::Authz.check = ->(person, action, account) { Permissions.allow?(person, action, account) }
-   HubKernel::Context.scope = ->(account, &call) { Current.set(account: account, &call) }
+   Rails.application.config.to_prepare do
+     Supplies.spend_recorder = Finance.method(:record_spend)
+     HubKernel::Authz.check = ->(person, action, account) { Permissions.allow?(person, action, account) }
+     HubKernel::Context.scope = ->(account, &call) { Current.set(account: account, &call) }
+     HubKernel::Hubs.check!
+   end
    ```
 
+   - While any loaded hub exposes a method, the start check refuses to start until both are set to something that responds to `call`.
    - The permission check answers both a call by name and a listing of what a person may call, so the two always agree.
    - Listing what a person may call needs only the permission check, while a call by name needs both.
    - The action is a string made of the hub and the method, such as `"supplies:record_purchase"`.
@@ -109,12 +114,13 @@ hub_kernel lets a Rails host app fill the ports each hub declares, refuse to sta
 
 ## Conventions
 - After installing, `bin/rails runner 'HubKernel::Hubs.check!'` exits with no error, and every hub check and the crossing check pass.
-- The start check reports unfilled ports only, while the hub check also reports a port filled with something that cannot be called.
+- The start check reports unfilled ports, and the permission check or account scope when unset or not callable while a hub exposes a method.
+- The hub check reports one hub's unfilled ports and each port filled with something that cannot be called, which the start check does not report.
 - A domain gem never runs the hub check, since it never fills its own ports, so the hub check always lives in the host's tests.
 - A view belongs to the hub that owns its controller, then to the hub that owns the record its folder is named after, and otherwise to the host's layer.
 - A constant inside another hub's class counts as naming that class.
 - Only the host's layer may name a hub's interface module.
 - A class listed by name under `owners` belongs to that hub even inside another hub's namespace.
 - The crossing check fails with "The crossing check found no files to read" when its `files:` pattern matches nothing the map owns, so fix the pattern or the map rather than the test.
-- When a hub gains a port, fill it in the `to_prepare` block. When a class is added, renamed or removed, update the crossing map, since the check fails on a class no hub owns and on a mapped class that no longer exists.
+- When a hub gains a port, fill it in the `to_prepare` block. When a hub first exposes a method, set the permission check and the account scope there too. When a class is added, renamed or removed, update the crossing map, since the check fails on a class no hub owns and on a mapped class that no longer exists.
 - Writing a hub, declaring its ports, and listing the methods it exposes are not part of installing and are out of scope here.
