@@ -38,7 +38,9 @@ hub_kernel lets a hub, one domain area written as a module, state what it needs 
    bin/rails generate hub_kernel:hub Ledger entry_recorder:record_entry
    ```
 
-   - In a Rails engine gem it writes the hub under the gem's namespace, such as `app/models/billing/ledger.rb` holding `module Billing::Ledger`, and adds hub_kernel to the gemspec. It writes no test, since the gem never fills its own ports.
+   - In a Rails engine gem it adds hub_kernel to the gemspec once, and writes no test, since the gem never fills its own ports.
+   - When the engine isolates its namespace, the hub goes under that namespace, such as `app/models/billing/ledger.rb` holding `module Billing::Ledger`.
+   - A namespaced name such as `Console::Hubs::Billing` writes the hub at the matching nested path, such as `app/models/console/hubs/billing.rb`.
    - In an app it writes the hub under `app/models` and the hub's wiring test under `test/models`.
 
    The generated hub:

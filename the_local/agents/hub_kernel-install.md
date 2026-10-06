@@ -58,11 +58,11 @@ hub_kernel lets a Rails host app fill the ports each hub declares, refuse to sta
    - While any loaded hub exposes a method, the start check refuses to start until both are set to something that responds to `call`.
    - The permission check answers both a call by name and a listing of what a person may call, so the two always agree.
    - Listing what a person may call needs only the permission check, while a call by name needs both.
-   - The action is a string made of the hub and the method, such as `"supplies:record_purchase"`.
+   - The action is a string made of the hub's own name, without its namespace and in snake case, then the method, such as `"supplies:record_purchase"` for `Shop::Supplies`.
    - The permission check must answer exactly `true` or `false`, and any other answer makes the call or the listing raise an error.
    - The account scope must take the block and run it, or the hub method never runs.
 
-6. Add one hub check per hub to the host's tests, such as `test/hubs/supplies_hub_test.rb`:
+6. Add one hub check to the host's tests for each hub that declares at least one port, such as `test/hubs/supplies_hub_test.rb`:
 
    ```ruby
    require "hub_kernel/conformance/hub"
@@ -74,7 +74,8 @@ hub_kernel lets a Rails host app fill the ports each hub declares, refuse to sta
    end
    ```
 
-   The `require` line is needed because the gem does not load the test modules on its own.
+   - The `require` line is needed because the gem does not load the test modules on its own.
+   - A hub that exposes methods but declares no port gets no hub check, since the check errors on a hub with no ports.
 
 7. Ask the developer for the crossing map, since only they know which hub owns which class:
    - which classes each hub owns;
@@ -119,8 +120,9 @@ hub_kernel lets a Rails host app fill the ports each hub declares, refuse to sta
 - A domain gem never runs the hub check, since it never fills its own ports, so the hub check always lives in the host's tests.
 - A view belongs to the hub that owns its controller, then to the hub that owns the record its folder is named after, and otherwise to the host's layer.
 - A constant inside another hub's class counts as naming that class.
-- Only the host's layer may name a hub's interface module.
+- A hub's interface module may be named by the host's layer and by that hub, and by no other hub.
 - A class listed by name under `owners` belongs to that hub even inside another hub's namespace.
+- The check for unowned classes reads only Ruby files outside `app/views`, so a view never needs its own entry in the map.
 - The crossing check fails with "The crossing check found no files to read" when its `files:` pattern matches nothing the map owns, so fix the pattern or the map rather than the test.
 - When a hub gains a port, fill it in the `to_prepare` block. When a hub first exposes a method, set the permission check and the account scope there too. When a class is added, renamed or removed, update the crossing map, since the check fails on a class no hub owns and on a mapped class that no longer exists.
 - Writing a hub, declaring its ports, and listing the methods it exposes are not part of installing and are out of scope here.
