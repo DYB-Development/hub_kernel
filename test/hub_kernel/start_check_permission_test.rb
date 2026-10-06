@@ -27,5 +27,11 @@ module HubKernel
 
       assert_raises(HubKernel::UnwiredPortError, match: "hub_kernel's permission check is not filled") { HubKernel::Hubs.check! }
     end
+
+    test "an app whose hubs expose a method refuses to start without the account scope and names it" do
+      HubKernel::Context.scope = nil
+
+      assert_raises(HubKernel::UnwiredPortError, match: "hub_kernel's account scope is not filled") { HubKernel::Hubs.check! }
+    end
   end
 end

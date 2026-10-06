@@ -1,4 +1,5 @@
 require "hub_kernel/authz"
+require "hub_kernel/context"
 
 module HubKernel
   module Hubs
@@ -17,7 +18,7 @@ module HubKernel
     def self.unfilled_host_answers
       return [] unless list.any? { |hub| hub.respond_to?(:exposures) && hub.exposures.any? }
 
-      Authz.check ? [] : [ "hub_kernel's permission check is not filled" ]
+      { "permission check" => Authz.check, "account scope" => Context.scope }.filter_map { |answer, filled| "hub_kernel's #{answer} is not filled" unless filled }
     end
     private_class_method :unfilled_host_answers
   end
