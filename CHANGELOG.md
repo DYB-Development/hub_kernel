@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [0.18.0] - 2026-10-06
+
+### Removed
+- `HubKernel::Context::Null`, the context with a fixed actor and tenant. `HubKernel::Context.scope`, set once by the host, replaces it.
+- `gates` and `gated_actions` on a hub that included `HubKernel::Authz`, and the per-object `allowed?(actor, action)` it asked of a policy. `HubKernel::Authz.check`, set once by the host and asked on every call by name, replaces them.
+
 ## [0.17.0] - 2026-10-06
 
 ### Added
