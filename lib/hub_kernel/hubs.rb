@@ -18,8 +18,15 @@ module HubKernel
     def self.unfilled_host_answers
       return [] unless list.any? { |hub| hub.respond_to?(:exposures) && hub.exposures.any? }
 
-      { "permission check" => Authz.check, "account scope" => Context.scope }.filter_map { |answer, filled| "hub_kernel's #{answer} is not filled" unless filled }
+      { "permission check" => Authz.check, "account scope" => Context.scope }.filter_map { |answer, filled| host_answer_problem(answer, filled) }
     end
     private_class_method :unfilled_host_answers
+
+    def self.host_answer_problem(answer, filled)
+      return "hub_kernel's #{answer} is not filled" unless filled
+
+      "hub_kernel's #{answer} is filled with something that cannot be called" unless filled.respond_to?(:call)
+    end
+    private_class_method :host_answer_problem
   end
 end

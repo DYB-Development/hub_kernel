@@ -47,5 +47,11 @@ module HubKernel
 
       assert_nothing_raised { HubKernel::Hubs.check! }
     end
+
+    test "a permission check filled with something that cannot be called is named" do
+      HubKernel::Authz.check = "allow everyone"
+
+      assert_raises(HubKernel::UnwiredPortError, match: "hub_kernel's permission check is filled with something that cannot be called") { HubKernel::Hubs.check! }
+    end
   end
 end
