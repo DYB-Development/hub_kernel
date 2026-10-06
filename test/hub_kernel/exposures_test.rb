@@ -13,6 +13,10 @@ module HubKernel
       def self.restock(item:) = item
     end
 
+    module Shed
+      extend HubKernel::Exposes
+    end
+
     setup { @check = HubKernel::Authz.check }
     teardown { HubKernel::Authz.check = @check }
 
@@ -24,6 +28,16 @@ module HubKernel
       HubKernel::Authz.check = ->(person, action, account) { person == :sam && account == :acme && action == "shop:price_of" }
 
       assert_equal [ :price_of ], Shop.exposures_for(person: :sam, account: :acme).map(&:name)
+    end
+
+    test "a hub that exposes nothing gives an empty list" do
+      assert_empty Shed.exposures
+    end
+
+    test "a person allowed nothing gets an empty list" do
+      HubKernel::Authz.check = ->(*) { false }
+
+      assert_empty Shop.exposures_for(person: :sam, account: :acme)
     end
   end
 end
