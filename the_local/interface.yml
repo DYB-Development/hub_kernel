@@ -19,6 +19,8 @@ develop:
   - exposes
   - exposed
   - call_exposed
+  - exposures
+  - exposures_for
   - HubKernel::Refused
   - HubKernel::UnexposedMethodError
   - HubKernel::MissingArgumentError

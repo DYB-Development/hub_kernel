@@ -16,9 +16,16 @@ module HubKernel
 
     def exposed(name) = exposed_methods[name.to_s]
 
+    def exposures = exposed_methods.values
+
+    def exposures_for(person:, account:)
+      refuse_without_caller(person, account)
+
+      exposures.select { |exposure| allowed?(exposure, person, account) }
+    end
+
     def call_exposed(name, values:, person:, account:)
-      raise MissingArgumentError, "A call by name needs a person" if person.nil?
-      raise MissingArgumentError, "A call by name needs an account" if account.nil?
+      refuse_without_caller(person, account)
 
       exposure = exposed(name) || raise(UnexposedMethodError, "#{exposing_hub} does not expose #{name}")
       refuse_unless_allowed(exposure, person, account)
@@ -36,12 +43,22 @@ module HubKernel
 
     def exposing_hub = name.demodulize
 
+    def refuse_without_caller(person, account)
+      raise MissingArgumentError, "A call by name needs a person" if person.nil?
+      raise MissingArgumentError, "A call by name needs an account" if account.nil?
+    end
+
     def refuse_unless_allowed(exposure, person, account)
+      raise NotAllowed, "#{exposing_hub} #{exposure.name}" unless allowed?(exposure, person, account)
+    end
+
+    def allowed?(exposure, person, account)
       raise UnwiredPortError, "hub_kernel's permission check is not filled" unless Authz.check
 
       answer = Authz.check.call(person, "#{exposing_hub.underscore}:#{exposure.name}", account)
       raise NonBooleanAnswerError, "The permission check must answer true or false, got #{answer.inspect}" unless [ true, false ].include?(answer)
-      raise NotAllowed, "#{exposing_hub} #{exposure.name}" unless answer
+
+      answer
     end
 
     def within_account(account, &call)

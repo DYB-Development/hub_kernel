@@ -130,6 +130,19 @@ method requires, and passes on only the values the method is listed with. A hub 
 `HubKernel::Refused` with a reason when it will not do what was asked, and the reason
 reaches the caller unchanged.
 
+### Listing what a person may call
+An interface can show a caller what it may call before it calls anything. `exposures`
+gives every entry a hub exposes, each with its name, the values it takes and whether it
+writes. `exposures_for` gives only the entries the host's permission check allows one
+person on one account:
+
+```ruby
+Supplies.exposures_for(person: current_person, account: current_account).map(&:name)
+```
+
+It refuses a missing person or account as a call by name does, and a hub that exposes
+nothing, or a person allowed nothing, gets an empty list.
+
 ### The host's permission check and account scope
 Every call by name asks the host whether the person may take the action on the account,
 and runs the method inside the host's scope for that account. The host sets both once

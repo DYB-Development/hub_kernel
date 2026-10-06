@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [0.16.0] - 2026-10-05
+
+### Added
+- `exposures` on a hub, which gives every entry it exposes with its name, the values it takes and whether it writes.
+- `exposures_for(person:, account:)` on a hub, which gives only the entries the host's permission check allows that person on that account.
+
 ## [0.15.0] - 2026-10-05
 
 ### Added
