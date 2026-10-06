@@ -33,5 +33,12 @@ module HubKernel
 
       assert_raises(HubKernel::UnwiredPortError, match: "hub_kernel's account scope is not filled") { HubKernel::Hubs.check! }
     end
+
+    test "a hub that exposes a method is listed for the start check" do
+      HubKernel::Hubs.list.clear
+      Module.new { extend HubKernel::Exposes }.tap { |hub| hub.define_singleton_method(:name) { "Pantry" } }.exposes(:count, takes: [], writes: false)
+
+      assert_equal [ "Pantry" ], HubKernel::Hubs.list.map(&:name)
+    end
   end
 end
