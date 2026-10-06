@@ -19,15 +19,13 @@ module HubKernel
     def exposures = exposed_methods.values
 
     def exposures_for(person:, account:)
-      raise MissingArgumentError, "A call by name needs a person" if person.nil?
-      raise MissingArgumentError, "A call by name needs an account" if account.nil?
+      refuse_without_caller(person, account)
 
       exposures.select { |exposure| allowed?(exposure, person, account) }
     end
 
     def call_exposed(name, values:, person:, account:)
-      raise MissingArgumentError, "A call by name needs a person" if person.nil?
-      raise MissingArgumentError, "A call by name needs an account" if account.nil?
+      refuse_without_caller(person, account)
 
       exposure = exposed(name) || raise(UnexposedMethodError, "#{exposing_hub} does not expose #{name}")
       refuse_unless_allowed(exposure, person, account)
@@ -44,6 +42,11 @@ module HubKernel
     def exposed_methods = @exposed_methods ||= {}
 
     def exposing_hub = name.demodulize
+
+    def refuse_without_caller(person, account)
+      raise MissingArgumentError, "A call by name needs a person" if person.nil?
+      raise MissingArgumentError, "A call by name needs an account" if account.nil?
+    end
 
     def refuse_unless_allowed(exposure, person, account)
       raise NotAllowed, "#{exposing_hub} #{exposure.name}" unless allowed?(exposure, person, account)
