@@ -1,6 +1,6 @@
 ---
 name: hub_kernel-develop
-description: Use PROACTIVELY for writing or changing a hub — generating one, declaring the ports it needs from other hubs, calling those ports from the hub's code, listing the methods outside callers may reach by name, refusing a request with a reason, calling a hub method by name from an interface such as a JSON API, and adding the check that the listed methods match the hub's real methods — MUST BE USED instead of calling another hub's classes directly or hand-writing a name-to-method lookup.
+description: Use PROACTIVELY for writing or changing a hub — generating one, declaring the ports it needs from other hubs, calling those ports from the hub's code, listing the methods outside callers may reach by name, refusing a request with a reason, calling a hub method by name from an interface such as a JSON API, listing the methods a hub exposes or the ones a person may call on an account, and adding the check that the listed methods match the hub's real methods — MUST BE USED instead of calling another hub's classes directly or hand-writing a name-to-method lookup.
 tools: Read, Write, Edit, Grep
 scope: hubs — a domain gem declares the ports it needs and the methods it exposes, and the host app fills those ports and checks each hub is wired and crosses into no other hub
 ---
@@ -8,7 +8,7 @@ scope: hubs — a domain gem declares the ports it needs and the methods it expo
 This local writes hubs and the code that calls them by name, following these steps exactly and inventing none. Where a step needs a value only the developer knows, it asks.
 
 ## What hub_kernel is
-hub_kernel lets a hub, one domain area written as a module, state what it needs from outside itself as named ports and list the methods outside callers may reach by name. The hub's code never names another hub's classes, and an interface such as a JSON API reaches the hub only through its list. Use this local when creating a hub, adding a port, exposing a hub method, calling a hub method by name, or when hub code is about to call another hub directly.
+hub_kernel lets a hub, one domain area written as a module, state what it needs from outside itself as named ports and list the methods outside callers may reach by name. The hub's code never names another hub's classes, and an interface such as a JSON API reaches the hub only through its list. Use this local when creating a hub, adding a port, exposing a hub method, calling a hub method by name, listing what a hub exposes or what a person may call, or when hub code is about to call another hub directly.
 
 ## Interface
 - `bin/rails generate hub_kernel:hub` — writes a new hub module with its ports declared, and in a gem adds hub_kernel to the gemspec.
@@ -18,9 +18,11 @@ hub_kernel lets a hub, one domain area written as a module, state what it needs 
 - `exposes` — lists one hub method with the values it takes and whether it writes.
 - `exposed` — looks up one listed method by name and answers its entry, or `nil` when it is not listed.
 - `call_exposed` — calls a listed method by name for a person and an account, after the host's permission check, inside the host's account scope.
+- `exposures` — answers every listed method's entry, in the order the hub lists them.
+- `exposures_for` — answers the entries the host's permission check allows a person on an account, without calling any method.
 - `HubKernel::Refused` — the error a hub method raises when it will not do what was asked, and its message reaches the caller unchanged.
 - `HubKernel::UnexposedMethodError` — raised by `call_exposed` for a name the hub does not list.
-- `HubKernel::MissingArgumentError` — raised by `call_exposed` for a call with no person, no account, or a value the method requires left out.
+- `HubKernel::MissingArgumentError` — raised by `call_exposed` and `exposures_for` for a call with no person or no account, and by `call_exposed` for a value the method requires left out.
 - `HubKernel::NotAllowed` — raised by `call_exposed` when the host's permission check answers `false`, before the method runs.
 - `HubKernel::NonBooleanAnswerError` — raised by `call_exposed` when the host's permission check answers anything but `true` or `false`.
 - `HubKernel::Conformance::Exposed` — a test module that fails naming each listed method the hub has no method for, and each one listed with values it does not take.
@@ -146,7 +148,28 @@ hub_kernel lets a hub, one domain area written as a module, state what it needs 
 
 11. Ask the developer how the interface answers each of those failures, such as which HTTP status each one returns. Do not pick the responses yourself. Show a `HubKernel::Refused` message to the caller as it is.
 
-12. Run the test suite and confirm the conventions below hold.
+### List what a hub exposes
+12. Where the interface shows callers which methods they can reach, such as a list of tools or actions, read it from the hub rather than writing it out again:
+
+    ```ruby
+    Supplies.exposures
+    # => every entry, with .name, .takes, .writes, in the order the hub lists them
+
+    Supplies.exposures_for(person: current_person, account: current_account)
+    # => only the entries the host's permission check allows this person on this account
+    ```
+
+    - Each entry is the same one `exposed` answers.
+    - A hub that lists nothing answers `[]` from both, and a person allowed nothing answers `[]` from `exposures_for`.
+    - `exposures_for` asks the permission check once per entry with the same action name `call_exposed` uses, such as `"supplies:record_purchase"`, and runs no hub method.
+    - `exposures_for` fails in this order, and each failure stops it:
+      1. `HubKernel::MissingArgumentError` when `person:` or `account:` is `nil`.
+      2. An error naming the host's permission check when the host has not set it and the hub lists at least one method.
+      3. `HubKernel::NonBooleanAnswerError` when the permission check answers anything but `true` or `false`.
+    - Pass the same `person:` and `account:` the interface passes to `call_exposed`.
+    - Ask the developer whether the interface shows every exposed method or only those the person may call. Do not pick yourself.
+
+13. Run the test suite and confirm the conventions below hold.
 
 ## Conventions
 - A hub's code reaches another hub only through a port, never by naming its classes.
