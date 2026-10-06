@@ -20,6 +20,7 @@ module HubKernel
 
     def exposures_for(person:, account:)
       raise MissingArgumentError, "A call by name needs a person" if person.nil?
+      raise MissingArgumentError, "A call by name needs an account" if account.nil?
 
       exposures.select { |exposure| allowed?(exposure, person, account) }
     end
