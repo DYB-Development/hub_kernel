@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## [0.15.0] - 2026-10-05
+
+### Added
+- hub_kernel is a the_local provider: installing it gives an app its info, install and develop agents.
+
 ## [0.14.0] - 2026-10-05
 
 ### Added
