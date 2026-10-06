@@ -16,6 +16,8 @@ module HubKernel
 
     def exposed(name) = exposed_methods[name.to_s]
 
+    def exposures = exposed_methods.values
+
     def call_exposed(name, values:, person:, account:)
       raise MissingArgumentError, "A call by name needs a person" if person.nil?
       raise MissingArgumentError, "A call by name needs an account" if account.nil?
