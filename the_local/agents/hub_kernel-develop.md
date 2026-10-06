@@ -177,4 +177,5 @@ hub_kernel lets a hub, one domain area written as a module, state what it needs 
 - Every exposed method is listed with `exposes`, and the exposed-list check passes.
 - When an exposed method gains, loses or renames a keyword, update its `takes:` in the same change.
 - When a hub gains a port, tell the developer every host app must fill it, since calling it unfilled raises an error and the host's start check fails.
+- When a hub exposes its first method, tell the developer every host app must set the permission check and the account scope, since the host's start check fails while any hub exposes a method and either is unset or cannot be called.
 - Adding the gem to a host, filling ports, running the start check, setting the permission check and the account scope, and the host's hub and crossing checks belong to the install local and are out of scope here.

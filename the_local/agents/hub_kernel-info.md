@@ -24,15 +24,15 @@ This local documents no commands. The surface belongs to the other two locals:
 
 Decide which side you are on:
 
-- You are wiring hubs into an app, or the app will not start because something is not wired: use **hub_kernel-install**.
+- You are wiring hubs into an app, or the app will not start because something is not wired or not filled: use **hub_kernel-install**.
 - You are writing or changing a hub, inside a domain gem or the app: use **hub_kernel-develop**.
 
 ## Conventions
 
-- **Hub** — one domain area, written as a module. In a domain gem it sits under the gem's namespace, such as Billing::Ledger.
+- **Hub** — one domain area, written as a module. In a domain gem it sits under the gem's namespace, such as Billing::Ledger. A hub is known to the app once it declares a port or lists a method callable by name.
 - **Ports** — what a hub needs from outside. Each has a name and the method the hub's own code calls, such as a spend recorder called as record_spend.
 - **Filling ports** — the host app sets each of a hub's ports to any callable, usually another hub's method, in its setup that runs again on every code reload. Ports are "wired" once they are filled.
-- **Start check** — the app refuses to start while any hub's ports are not wired, and names each one, such as "Supplies' spend recorder is not wired".
+- **Start check** — the app refuses to start while any hub's ports are not wired, and names each one, such as "Supplies' spend recorder is not wired". While any hub lists a method callable by name, it also refuses to start until the permission check and the account scope are both set to something that can be called, and names whichever is missing or cannot be called. An app whose hubs list no such methods starts without either.
 - **Hub check** — a host test that fails naming each of a hub's ports left unfilled or filled with something that cannot be called. A domain gem never runs it, since the gem never fills its own ports.
 - **Call by name** — a caller reaches a hub method by its name as a string, with the values sent, the person, and the account. Unknown names, a missing person or account, and missing required values are refused.
 - **What a person may call** — the hub's list of methods callable by name, kept to those the permission check allows for one person on one account. Asking with no person or no account is refused, the same as a call by name. A hub that lists nothing, or a person allowed nothing, gets an empty list rather than an error.
