@@ -6,5 +6,9 @@ module HubKernel
     test "hub_kernel offers no per-hub list of gated actions" do
       assert_not HubKernel::Authz.const_defined?(:Vocabulary, false)
     end
+
+    test "hub_kernel offers no per-object permission policy" do
+      assert_not HubKernel::Authz.method_defined?(:allowed?)
+    end
   end
 end
