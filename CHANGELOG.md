@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [0.19.0] - 2026-10-06
+
+### Changed
+- hub_kernel depends on hub_kernel-interface, which now holds `HubKernel::Exposes`, `HubKernel::Authz`, `HubKernel::Context` and the errors they raise, under the same names. A hub and a host change nothing.
+- `HubKernel::Hubs.list` reads hub_kernel-interface's record of hubs that expose methods alongside the hubs that declare ports.
+
 ## [0.18.0] - 2026-10-06
 
 ### Removed
