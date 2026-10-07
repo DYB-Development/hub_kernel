@@ -48,6 +48,15 @@ module HubKernel
       HubsTest.send(:remove_const, :Catalog)
     end
 
+    test "a hub that declares ports and exposes methods is on the list once" do
+      hub = Module.new { extend HubKernel::Ports; extend HubKernel::Exposes }
+      hub.define_singleton_method(:name) { "Warehouse" }
+      hub.port :stock_reader, as: :stock_levels
+      hub.exposes :count, takes: [], writes: false
+
+      assert_equal 1, HubKernel::Hubs.list.count { |listed| listed.name == "Warehouse" }
+    end
+
     test "the refusal names every unfilled port" do
       error = assert_raises(HubKernel::UnwiredPortError) { HubKernel::Hubs.check! }
 
