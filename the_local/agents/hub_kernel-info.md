@@ -11,7 +11,7 @@ This local explains hub_kernel and the words it uses. It makes no changes and gi
 
 hub_kernel splits a Rails app into hubs, where each hub is one area of the domain, such as supplies or finance, usually shipped in its own domain gem. A hub states what it needs from outside itself as named ports, and the host app decides what fills each one, so a hub never names another hub's code directly.
 
-A hub also lists the methods outside callers may reach by name, with the values each takes and whether it writes. An interface such as a JSON API calls through that list, and every call is checked against the host's permission rule and run inside the host's account scope. The same list can be read back whole, or cut down to only the methods one person is allowed to call on one account, so an interface can show a person what they may do before they try it. Reach for hub_kernel when an app has several domain areas that should talk to each other only through declared entry points, and you want the app to refuse to start, or the suite to fail, when that is not true.
+A hub also lists the methods outside callers may reach by name, with the values each takes and whether it writes. An interface such as a JSON API calls through that list, and every call is checked against the host's permission rule and run inside the host's account scope. The same list can be read back whole, or cut down to only the methods one person is allowed to call on one account, so an interface can show a person what they may do before they try it. That list, calling by name, the permission check and the account scope come from hub_kernel-interface, which hub_kernel depends on, so a hub that lists methods needs no second gem. Reach for hub_kernel when an app has several domain areas that should talk to each other only through declared entry points, and you want the app to refuse to start, or the suite to fail, when that is not true.
 
 ## Interface
 
@@ -29,7 +29,8 @@ Decide which side you are on:
 
 ## Conventions
 
-- **Hub** — one domain area, written as a module. In a domain gem it sits under the gem's namespace, such as Billing::Ledger. A hub is known to the app once it declares a port or lists a method callable by name.
+- **Hub** — one domain area, written as a module. In a domain gem it sits under the gem's namespace, such as Billing::Ledger. A hub is known to the app once it declares a port or lists a method callable by name, and the start check covers both kinds.
+- **hub_kernel-interface** — the smaller gem hub_kernel builds on, holding the methods-callable-by-name list, the permission check and the account scope. Interface gems such as hub_kernel-api depend on it alone, while hubs and host apps keep depending on hub_kernel.
 - **Ports** — what a hub needs from outside. Each has a name and the method the hub's own code calls, such as a spend recorder called as record_spend.
 - **Filling ports** — the host app sets each of a hub's ports to any callable, usually another hub's method, in its setup that runs again on every code reload. Ports are "wired" once they are filled.
 - **Start check** — the app refuses to start while any hub's ports are not wired, and names each one, such as "Supplies' spend recorder is not wired". While any hub lists a method callable by name, it also refuses to start until the permission check and the account scope are both set to something that can be called, and names whichever is missing or cannot be called. An app whose hubs list no such methods starts without either.
