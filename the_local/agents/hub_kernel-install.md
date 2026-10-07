@@ -14,7 +14,7 @@ hub_kernel lets a Rails host app fill the ports each hub declares, refuse to sta
 - `gem "hub_kernel"` — the Gemfile line that adds the gem to the host app.
 - `HubKernel::Hubs.check!` — raises `HubKernel::UnwiredPortError` naming every unfilled port of every loaded hub, one per line, such as "Supplies' spend recorder is not wired", and, while any loaded hub exposes a method, the permission check or the account scope when either is unset or cannot be called.
 - `HubKernel::Hubs.list` — the hubs that have loaded and declared at least one port or exposed at least one method.
-- `HubKernel::UnwiredPortError` — raised by the start check, by calling an unfilled port, by a call by name while the permission check or the account scope is unset, and by listing what a person may call from a hub that exposes at least one method while the permission check is unset.
+- `HubKernel::UnwiredPortError` — raised by the start check, by calling an unfilled port, and by a call by name while the permission check or the account scope is unset.
 - `HubKernel::Authz.check` — the host-wide permission rule, a callable taking a person, an action and an account and answering `true` or `false`.
 - `HubKernel::Context.scope` — the host-wide account scope, a callable taking an account and a block and running the block inside that account.
 - `HubKernel::Conformance::Hub` — a test module that fails naming each of one hub's ports left unfilled or filled with something that cannot be called.
@@ -27,6 +27,8 @@ hub_kernel lets a Rails host app fill the ports each hub declares, refuse to sta
    ```ruby
    gem "hub_kernel"
    ```
+
+   `bundle install` also installs hub_kernel-interface, which holds the permission check and the account scope, so add no other gem for them.
 
 2. List the hubs the app uses and each port they declare. Ask the developer what fills each port, such as another hub's method. Do not pick a filler yourself.
 
@@ -57,7 +59,6 @@ hub_kernel lets a Rails host app fill the ports each hub declares, refuse to sta
 
    - While any loaded hub exposes a method, the start check refuses to start until both are set to something that responds to `call`.
    - The permission check answers both a call by name and a listing of what a person may call, so the two always agree.
-   - Listing what a person may call needs only the permission check, while a call by name needs both.
    - The action is a string made of the hub's own name, without its namespace and in snake case, then the method, such as `"supplies:record_purchase"` for `Shop::Supplies`.
    - The permission check must answer exactly `true` or `false`, and any other answer makes the call or the listing raise an error.
    - The account scope must take the block and run it, or the hub method never runs.

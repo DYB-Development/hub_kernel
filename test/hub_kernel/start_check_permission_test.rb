@@ -11,14 +11,17 @@ module HubKernel
     end
 
     setup do
-      @listed, @check, @scope = HubKernel::Hubs.list.dup, HubKernel::Authz.check, HubKernel::Context.scope
-      HubKernel::Hubs.list.replace([ Shop ])
+      @registered, @exposing = HubKernel::Hubs.registered.dup, HubKernel::Interface::ExposingHubs.list.dup
+      @check, @scope = HubKernel::Authz.check, HubKernel::Context.scope
+      HubKernel::Hubs.registered.clear
+      HubKernel::Interface::ExposingHubs.list.replace([ Shop ])
       HubKernel::Authz.check = ->(*) { true }
       HubKernel::Context.scope = ->(_account, &call) { call.call }
     end
 
     teardown do
-      HubKernel::Hubs.list.replace(@listed)
+      HubKernel::Hubs.registered.replace(@registered)
+      HubKernel::Interface::ExposingHubs.list.replace(@exposing)
       HubKernel::Authz.check, HubKernel::Context.scope = @check, @scope
     end
 
@@ -35,14 +38,14 @@ module HubKernel
     end
 
     test "a hub that exposes a method is listed for the start check" do
-      HubKernel::Hubs.list.clear
+      HubKernel::Interface::ExposingHubs.list.clear
       Module.new { extend HubKernel::Exposes }.tap { |hub| hub.define_singleton_method(:name) { "Pantry" } }.exposes(:count, takes: [], writes: false)
 
       assert_equal [ "Pantry" ], HubKernel::Hubs.list.map(&:name)
     end
 
     test "an app whose hubs expose nothing starts without the permission check or the account scope" do
-      HubKernel::Hubs.list.replace([ Module.new { extend HubKernel::Exposes } ])
+      HubKernel::Interface::ExposingHubs.list.replace([ Module.new { extend HubKernel::Exposes } ])
       HubKernel::Authz.check, HubKernel::Context.scope = nil, nil
 
       assert_nothing_raised { HubKernel::Hubs.check! }

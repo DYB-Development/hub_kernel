@@ -13,10 +13,10 @@ module HubKernel
       assert_equal "/gems/example/app/views/**/*.erb", ExampleGem.markup_path
     end
 
-    test "offering the path needs nothing beyond rails" do
+    test "offering the path needs nothing beyond rails and hub_kernel-interface" do
       gemspec = Gem::Specification.load(HubKernel::Engine.root.join("hub_kernel.gemspec").to_s)
 
-      assert_equal [ "rails" ], gemspec.dependencies.map(&:name)
+      assert_equal [ "rails", "hub_kernel-interface" ], gemspec.dependencies.map(&:name)
     end
 
     test "the path is handed to no stylesheet build here" do

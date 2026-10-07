@@ -164,10 +164,7 @@ hub_kernel lets a hub, one domain area written as a module, state what it needs 
     - Each entry is the same one `exposed` answers.
     - A hub that lists nothing answers `[]` from both, and a person allowed nothing answers `[]` from `exposures_for`.
     - `exposures_for` asks the permission check once per entry with the same action name `call_exposed` uses, such as `"supplies:record_purchase"`, and runs no hub method.
-    - `exposures_for` fails in this order, and each failure stops it:
-      1. `HubKernel::MissingArgumentError` when `person:` or `account:` is `nil`.
-      2. An error naming the host's permission check when the host has not set it and the hub lists at least one method.
-      3. `HubKernel::NonBooleanAnswerError` when the permission check answers anything but `true` or `false`.
+    - `exposures_for` raises `HubKernel::MissingArgumentError` when `person:` or `account:` is `nil`, before asking the permission check.
     - Pass the same `person:` and `account:` the interface passes to `call_exposed`.
     - Ask the developer whether the interface shows every exposed method or only those the person may call. Do not pick yourself.
 

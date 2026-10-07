@@ -11,12 +11,14 @@ module HubKernel
     end
 
     setup do
-      @listed = HubKernel::Hubs.list.dup
-      HubKernel::Hubs.list.select! { |hub| hub == Operations }
+      @registered, @exposing = HubKernel::Hubs.registered.dup, HubKernel::Interface::ExposingHubs.list.dup
+      HubKernel::Hubs.registered.select! { |hub| hub == Operations }
+      HubKernel::Interface::ExposingHubs.list.clear
     end
 
     teardown do
-      HubKernel::Hubs.list.replace(@listed)
+      HubKernel::Hubs.registered.replace(@registered)
+      HubKernel::Interface::ExposingHubs.list.replace(@exposing)
       Operations.resource_namer = nil
       Operations.usage_reader = nil
     end
@@ -44,6 +46,15 @@ module HubKernel
       assert_equal 1, HubKernel::Hubs.list.count { |hub| hub.name == "HubKernel::HubsTest::Catalog" }
     ensure
       HubsTest.send(:remove_const, :Catalog)
+    end
+
+    test "a hub that declares ports and exposes methods is on the list once" do
+      hub = Module.new { extend HubKernel::Ports; extend HubKernel::Exposes }
+      hub.define_singleton_method(:name) { "Warehouse" }
+      hub.port :stock_reader, as: :stock_levels
+      hub.exposes :count, takes: [], writes: false
+
+      assert_equal 1, HubKernel::Hubs.list.count { |listed| listed.name == "Warehouse" }
     end
 
     test "the refusal names every unfilled port" do

@@ -1,14 +1,17 @@
 require "hub_kernel/authz"
 require "hub_kernel/context"
+require "hub_kernel/interface/exposing_hubs"
 
 module HubKernel
   module Hubs
     def self.add(hub)
-      list.reject! { |listed| listed.name == hub.name }
-      list << hub
+      registered.reject! { |listed| listed.name == hub.name }
+      registered << hub
     end
 
-    def self.list = @list ||= []
+    def self.registered = @registered ||= []
+
+    def self.list = (registered + Interface::ExposingHubs.list).uniq { |hub| hub.name || hub }
 
     def self.check!
       unwired = list.select { |hub| hub.respond_to?(:unwired_ports) }.flat_map(&:unwired_ports) + unfilled_host_answers

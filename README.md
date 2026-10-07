@@ -105,6 +105,11 @@ The test fails and names each port the app left unfilled, and each port filled w
 something that cannot be called.
 
 ### The exposed list
+The exposed list, calling by name, the permission check, the account scope and the errors
+they raise come from hub_kernel-interface, which hub_kernel depends on, so a hub keeps
+writing `extend HubKernel::Exposes` with no other gem to add. Interface gems such as
+hub_kernel-api depend on hub_kernel-interface alone.
+
 A hub names each method outside callers may reach, the values it takes, and whether it
 writes. A layer such as a JSON endpoint looks a method up by name and serves only what
 the hub exposes:
@@ -148,7 +153,7 @@ It refuses a missing person or account as a call by name does, and a hub that ex
 nothing, or a person allowed nothing, gets an empty list.
 
 ### The host's permission check and account scope
-Every call by name asks the host whether the person may take the action on the account,
+hub_kernel-interface holds both settings. Every call by name asks the host whether the person may take the action on the account,
 and runs the method inside the host's scope for that account. The host sets both once
 for the whole app:
 

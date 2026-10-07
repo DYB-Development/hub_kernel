@@ -45,7 +45,7 @@ module HubKernel
 
       assert_equal 5, GeneratedLedger.record_entry(amount: 5)
     ensure
-      HubKernel::Hubs.list.reject! { |hub| hub.name == "GeneratedLedger" }
+      HubKernel::Hubs.registered.reject! { |hub| hub.name == "GeneratedLedger" }
       Object.send(:remove_const, :GeneratedLedger) if Object.const_defined?(:GeneratedLedger)
     end
 

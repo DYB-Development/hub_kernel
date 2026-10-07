@@ -1,9 +1,9 @@
 require "active_support/core_ext/string/inflections"
 require "hub_kernel/hubs"
 
-module HubKernel
-  class UnwiredPortError < StandardError; end
+require "hub_kernel/exposes"
 
+module HubKernel
   module Ports
     def port(name, as:)
       Hubs.add(self)
