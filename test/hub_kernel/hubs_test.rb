@@ -11,12 +11,14 @@ module HubKernel
     end
 
     setup do
-      @listed = HubKernel::Hubs.list.dup
-      HubKernel::Hubs.list.select! { |hub| hub == Operations }
+      @registered, @exposing = HubKernel::Hubs.registered.dup, HubKernel::Interface::ExposingHubs.list.dup
+      HubKernel::Hubs.registered.select! { |hub| hub == Operations }
+      HubKernel::Interface::ExposingHubs.list.clear
     end
 
     teardown do
-      HubKernel::Hubs.list.replace(@listed)
+      HubKernel::Hubs.registered.replace(@registered)
+      HubKernel::Interface::ExposingHubs.list.replace(@exposing)
       Operations.resource_namer = nil
       Operations.usage_reader = nil
     end

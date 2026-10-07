@@ -1,6 +1,6 @@
-module HubKernel
-  class MissingArgumentError < ArgumentError; end
+require "hub_kernel/exposes"
 
+module HubKernel
   module Action
     attr_reader :person, :account, :values
 
