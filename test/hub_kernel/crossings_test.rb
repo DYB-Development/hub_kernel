@@ -190,5 +190,11 @@ module HubKernel
 
       assert_empty crossings.missing_classes
     end
+
+    test "a hub folder holding no hub module is found" do
+      crossings = HubKernel::Crossings.new(folder_files: [ "hubs/suplies/app/models/shop/purchase.rb" ])
+
+      assert_equal [ "hubs/suplies" ], crossings.folders_without_hub_module
+    end
   end
 end

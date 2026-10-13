@@ -47,6 +47,8 @@ module HubKernel
 
     def listed_in_their_folders = @owners.flat_map { |hub, classes| classes.select { |name| @folder_classes[name] == hub } }
 
+    def folders_without_hub_module = @folder_classes.values.uniq.reject { |hub| @interfaces.key?(hub) }.map { |hub| "hubs/#{hub}" }
+
     def missing_classes = @owners.values.flatten.uniq.reject { |name| @folder_classes.key?(name) || name.safe_constantize }
 
     private
