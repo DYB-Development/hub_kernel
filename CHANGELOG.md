@@ -9,6 +9,7 @@
 - A hub in the host app can keep its code in `hubs/<hub>/app/<kind>/`. Each of those folders is added to the host's load and eager load paths, so its classes load by their full names. Files under a hub's `lib/` folder are not loaded.
 
 ### Changed
+- Run in an app, the hub generator writes the hub into `hubs/<hub>/app/models/` and its hub check into `test/hubs/<hub>/`. Run inside a gem it writes what it did before.
 - `owners:` is optional on `HubKernel::Crossings`.
 
 ## [0.19.0] - 2026-10-06
