@@ -2,6 +2,7 @@ require "active_support/core_ext/string/inflections"
 
 module HubKernel
   class Crossings
+    HUB_FOLDER = %r{\Ahubs/([^/]+)/}
     def initialize(owners:, shared: [], host_layer: nil, interfaces: {}, namespaces: {})
       @owners = owners
       @shared = shared
@@ -53,6 +54,8 @@ module HubKernel
     def owner_of_namespace(class_name) = @namespaces.find { |_hub, spaces| spaces.any? { |space| class_name.start_with?("#{space}::") } }&.first
 
     def owner_of_file(path)
+      return Regexp.last_match(1).to_sym if path =~ HUB_FOLDER
+
       return owner_of_view_folder(File.dirname(path.delete_prefix("app/views/")).camelize) if path.start_with?("app/views/")
 
       owner_of(class_of(path))

@@ -110,5 +110,11 @@ module HubKernel
 
       assert_equal [ "Billing::Invoice" ], crossings.in("app/models/shop/purchase.rb", "Billing::Invoice::KINDS.first")
     end
+
+    test "a file under a hub's folder belongs to that hub without being on any list" do
+      crossings = HubKernel::Crossings.new(owners: {})
+
+      assert crossings.belongs?("hubs/supplies/app/models/shop/purchase.rb")
+    end
   end
 end
