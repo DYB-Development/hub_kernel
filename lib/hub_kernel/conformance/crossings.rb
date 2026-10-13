@@ -35,6 +35,11 @@ module HubKernel
           assert twice.empty?, twice.map { |name| "Two hubs own #{name}" }.join("\n")
         end
 
+        test "no class is both listed and in its hub's folder" do
+          listed = the_crossings.listed_in_their_folders
+          assert listed.empty?, listed.map { |name| "#{name} sits in its hub's folder, so take it off the list" }.join("\n")
+        end
+
         test "every class the map names exists" do
           missing = the_crossings.missing_classes
           assert missing.empty?, missing.map { |name| "The map names #{name}, which does not exist" }.join("\n")

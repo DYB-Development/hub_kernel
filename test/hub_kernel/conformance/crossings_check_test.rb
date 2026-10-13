@@ -100,6 +100,14 @@ module HubKernel
         end
       end
 
+      test "the crossing check fails naming each listed class already in its hub's folder" do
+        Dir.mktmpdir do |root|
+          write(root, "hubs/supplies/app/models/shop/purchase.rb", "module Shop; class Purchase; end; end")
+
+          assert_equal "Shop::Purchase sits in its hub's folder, so take it off the list", crossing_check_failure(root, test: "no class is both listed and in its hub's folder")
+        end
+      end
+
       private
 
       def write(root, path, source)
