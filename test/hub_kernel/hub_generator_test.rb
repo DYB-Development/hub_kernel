@@ -56,6 +56,13 @@ module HubKernel
       assert_file "billing.gemspec", /  spec.add_dependency "hub_kernel", "~> #{HubKernel::VERSION[/\A\d+\.\d+/]}"\nend/
     end
 
+    test "a hub generated inside a gem is written where the gem keeps its models" do
+      write_gemspec
+      run_generator [ "Billing" ]
+
+      assert_file "app/models/billing.rb", /module Billing\n  extend HubKernel::Ports\n/
+    end
+
     test "a second hub generated inside the same gem does not add hub_kernel twice" do
       write_gemspec
       run_generator [ "Billing" ]
