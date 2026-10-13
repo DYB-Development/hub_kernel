@@ -18,4 +18,10 @@ class HubFolderViewsTest < ActionDispatch::IntegrationTest
 
     assert_select ".which", "From the host"
   end
+
+  test "a helper in a hub folder is available in a view that takes every helper" do
+    get "/receipt"
+
+    assert_select ".total", "Total due"
+  end
 end
