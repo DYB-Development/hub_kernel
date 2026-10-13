@@ -4,7 +4,7 @@ module HubKernel
   class Crossings
     HUB_FOLDER = %r{\Ahubs/([^/]+)/}
     HUB_CODE = %r{\Ahubs/[^/]+/app/[^/]+/}
-    def initialize(owners:, shared: [], host_layer: nil, interfaces: {}, namespaces: {}, folder_files: [])
+    def initialize(owners: {}, shared: [], host_layer: nil, interfaces: {}, namespaces: {}, folder_files: [])
       @owners = owners
       @folder_classes = folder_files.to_h { |path| [ path.sub(HUB_CODE, "").delete_suffix(".rb").camelize, path[HUB_FOLDER, 1].to_sym ] }
       @shared = shared

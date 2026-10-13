@@ -128,5 +128,11 @@ module HubKernel
 
       assert_empty crossings.unowned_classes([ "hubs/supplies/app/models/shop/purchase.rb" ])
     end
+
+    test "the crossing check runs when the host passes no list of class names" do
+      crossings = HubKernel::Crossings.new(folder_files: [ "hubs/finance/app/models/shop/expense.rb" ])
+
+      assert_equal [ "Shop::Expense" ], crossings.in("hubs/supplies/app/models/shop/purchase.rb", "Shop::Expense.create!(name: name)")
+    end
   end
 end
