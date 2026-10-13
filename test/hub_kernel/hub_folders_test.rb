@@ -20,4 +20,8 @@ class HubKernel::HubFoldersTest < ActiveSupport::TestCase
   test "a class in a hub folder loads when its namespace module is defined in the host's app/models" do
     assert_equal "Storefront::Cart", "Storefront::Cart".constantize.name
   end
+
+  test "an event definition in a hub folder loads by its class name" do
+    assert_equal "Billing::InvoiceSent", "Billing::InvoiceSent".constantize.name
+  end
 end
