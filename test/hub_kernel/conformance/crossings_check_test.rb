@@ -108,6 +108,14 @@ module HubKernel
         end
       end
 
+      test "the crossing check fails naming each hub folder that holds no hub module" do
+        Dir.mktmpdir do |root|
+          write(root, "hubs/suplies/app/models/shop/purchase.rb", "module Shop; class Purchase; end; end")
+
+          assert_equal "hubs/suplies holds no hub module", crossing_check_failure(root, test: "every hub folder holds a hub module")
+        end
+      end
+
       private
 
       def write(root, path, source)
