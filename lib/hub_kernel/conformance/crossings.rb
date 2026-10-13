@@ -7,8 +7,8 @@ module HubKernel
       extend ActiveSupport::Concern
 
       class_methods do
-        def crossings(root: nil, files: "app/**/*.{rb,erb}", except: [], &block)
-          define_method(:the_crossings, &block)
+        def crossings(root: nil, files: "{app,hubs/*/app}/**/*.{rb,erb}", except: [], &block)
+          define_method(:built_crossings, &block)
           define_method(:crossing_root) { root || Rails.root }
           define_method(:crossing_files) { files }
           define_method(:crossing_exceptions) { except }
@@ -42,6 +42,8 @@ module HubKernel
       end
 
       def crossing_paths = (Dir.glob(crossing_files, base: crossing_root) - crossing_exceptions).sort
+
+      def the_crossings = @the_crossings ||= built_crossings.read_folders(Dir.glob("hubs/*/app/**/*.rb", base: crossing_root))
     end
   end
 end

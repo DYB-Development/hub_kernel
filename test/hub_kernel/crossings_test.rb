@@ -110,5 +110,53 @@ module HubKernel
 
       assert_equal [ "Billing::Invoice" ], crossings.in("app/models/shop/purchase.rb", "Billing::Invoice::KINDS.first")
     end
+
+    test "a file under a hub's folder belongs to that hub without being on any list" do
+      crossings = HubKernel::Crossings.new(owners: {})
+
+      assert crossings.belongs?("hubs/supplies/app/models/shop/purchase.rb")
+    end
+
+    test "a file in one hub's folder that names a class defined in another hub's folder names a crossing" do
+      crossings = HubKernel::Crossings.new(owners: {}, folder_files: [ "hubs/finance/app/models/shop/expense.rb" ])
+
+      assert_equal [ "Shop::Expense" ], crossings.in("hubs/supplies/app/models/shop/purchase.rb", "Shop::Expense.create!(name: name)")
+    end
+
+    test "a class defined in a hub's folder is not reported as owned by no hub" do
+      crossings = HubKernel::Crossings.new(owners: {})
+
+      assert_empty crossings.unowned_classes([ "hubs/supplies/app/models/shop/purchase.rb" ])
+    end
+
+    test "the crossing check runs when the host passes no list of class names" do
+      crossings = HubKernel::Crossings.new(folder_files: [ "hubs/finance/app/models/shop/expense.rb" ])
+
+      assert_equal [ "Shop::Expense" ], crossings.in("hubs/supplies/app/models/shop/purchase.rb", "Shop::Expense.create!(name: name)")
+    end
+
+    test "a file in a hub's folder that names a class from the same folder names no crossing" do
+      crossings = HubKernel::Crossings.new(folder_files: [ "hubs/supplies/app/models/shop/consumable.rb" ])
+
+      assert_empty crossings.in("hubs/supplies/app/models/shop/purchase.rb", "Shop::Consumable.find(id)")
+    end
+
+    test "a file in a hub's folder that names a class the host's list gives another hub names a crossing" do
+      crossings = HubKernel::Crossings.new(owners: OWNERS)
+
+      assert_equal [ "Shop::Expense" ], crossings.in("hubs/supplies/app/models/shop/purchase.rb", "Shop::Expense.create!(name: name)")
+    end
+
+    test "a file outside every hub folder that names a class in a hub's folder names a crossing" do
+      crossings = HubKernel::Crossings.new(owners: OWNERS, folder_files: [ "hubs/billing/app/models/billing/invoice.rb" ])
+
+      assert_equal [ "Billing::Invoice" ], crossings.in("app/models/shop/purchase.rb", "Billing::Invoice.create!(name: name)")
+    end
+
+    test "a class on the shared list named from a hub's folder names no crossing" do
+      crossings = HubKernel::Crossings.new(owners: OWNERS, shared: %w[Shop::Expense])
+
+      assert_empty crossings.in("hubs/supplies/app/models/shop/purchase.rb", "Shop::Expense.create!(name: name)")
+    end
   end
 end

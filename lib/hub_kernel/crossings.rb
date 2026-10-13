@@ -2,8 +2,12 @@ require "active_support/core_ext/string/inflections"
 
 module HubKernel
   class Crossings
-    def initialize(owners:, shared: [], host_layer: nil, interfaces: {}, namespaces: {})
+    HUB_FOLDER = %r{\Ahubs/([^/]+)/}
+    HUB_CODE = %r{\Ahubs/[^/]+/app/[^/]+/}
+    def initialize(owners: {}, shared: [], host_layer: nil, interfaces: {}, namespaces: {}, folder_files: [])
       @owners = owners
+      @folder_classes = {}
+      read_folders(folder_files)
       @shared = shared
       @host_layer = host_layer
       @interfaces = interfaces
@@ -15,10 +19,15 @@ module HubKernel
       source.scan(/[A-Z]\w*(?:::[A-Z]\w*)*/).filter_map { |name| owned_class_in(name) }.uniq.select { |name| crossing?(name, hub) }
     end
 
+    def read_folders(paths)
+      @folder_classes.merge!(paths.to_h { |path| [ path.sub(HUB_CODE, "").delete_suffix(".rb").camelize, path[HUB_FOLDER, 1].to_sym ] })
+      self
+    end
+
     def belongs?(path) = !owner_of_file(path).nil?
 
     def unowned_classes(paths)
-      paths.select { |path| path.end_with?(".rb") && !path.start_with?("app/views/") }.map { |path| class_of(path) }.reject { |name| owner_of(name) }
+      paths.select { |path| path.end_with?(".rb") && !path.start_with?("app/views/") && !path.match?(HUB_FOLDER) }.map { |path| class_of(path) }.reject { |name| owner_of(name) }
     end
 
     def claimed_twice = @owners.values.flatten.tally.select { |_name, hubs| hubs > 1 }.keys
@@ -46,13 +55,15 @@ module HubKernel
       space && "#{space}::#{name.delete_prefix("#{space}::").split("::").first}"
     end
 
-    def listed_owner_of(class_name) = @interfaces.key(class_name) || @owners.find { |_hub, classes| classes.include?(class_name) }&.first
+    def listed_owner_of(class_name) = @interfaces.key(class_name) || @folder_classes[class_name] || @owners.find { |_hub, classes| classes.include?(class_name) }&.first
 
     def owner_of(class_name) = listed_owner_of(class_name) || owner_of_namespace(class_name)
 
     def owner_of_namespace(class_name) = @namespaces.find { |_hub, spaces| spaces.any? { |space| class_name.start_with?("#{space}::") } }&.first
 
     def owner_of_file(path)
+      return Regexp.last_match(1).to_sym if path =~ HUB_FOLDER
+
       return owner_of_view_folder(File.dirname(path.delete_prefix("app/views/")).camelize) if path.start_with?("app/views/")
 
       owner_of(class_of(path))

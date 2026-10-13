@@ -82,6 +82,15 @@ module HubKernel
         end
       end
 
+      test "the crossing check reads every file in a hub's folder by default, helpers included" do
+        Dir.mktmpdir do |root|
+          write(root, "hubs/finance/app/models/shop/expense.rb", "module Shop; class Expense; end; end")
+          write(root, "hubs/supplies/app/helpers/shop/purchases_helper.rb", "Shop::Expense.sum(:amount)")
+
+          assert_equal "hubs/supplies/app/helpers/shop/purchases_helper.rb names Shop::Expense", crossing_check_failure(root, owners: {})
+        end
+      end
+
       private
 
       def write(root, path, source)
