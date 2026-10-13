@@ -47,7 +47,7 @@ module HubKernel
 
     def listed_in_their_folders = @owners.flat_map { |hub, classes| classes.select { |name| @folder_classes[name] == hub } }
 
-    def missing_classes = @owners.values.flatten.uniq.reject(&:safe_constantize)
+    def missing_classes = @owners.values.flatten.uniq.reject { |name| @folder_classes.key?(name) || name.safe_constantize }
 
     private
 

@@ -184,5 +184,11 @@ module HubKernel
 
       assert_equal [ "Console::Purchase" ], crossings.listed_in_their_folders
     end
+
+    test "a listed class whose file sits in a hub folder is not reported as missing" do
+      crossings = HubKernel::Crossings.new(owners: { supplies: %w[Shop::Ghostly] }, folder_files: [ "hubs/supplies/app/models/shop/ghostly.rb" ])
+
+      assert_empty crossings.missing_classes
+    end
   end
 end
