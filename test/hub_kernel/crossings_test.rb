@@ -146,5 +146,11 @@ module HubKernel
 
       assert_equal [ "Shop::Expense" ], crossings.in("hubs/supplies/app/models/shop/purchase.rb", "Shop::Expense.create!(name: name)")
     end
+
+    test "a file outside every hub folder that names a class in a hub's folder names a crossing" do
+      crossings = HubKernel::Crossings.new(owners: OWNERS, folder_files: [ "hubs/billing/app/models/billing/invoice.rb" ])
+
+      assert_equal [ "Billing::Invoice" ], crossings.in("app/models/shop/purchase.rb", "Billing::Invoice.create!(name: name)")
+    end
   end
 end
