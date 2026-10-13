@@ -6,7 +6,8 @@ module HubKernel
     HUB_CODE = %r{\Ahubs/[^/]+/app/[^/]+/}
     def initialize(owners: {}, shared: [], host_layer: nil, interfaces: {}, namespaces: {}, folder_files: [])
       @owners = owners
-      @folder_classes = folder_files.to_h { |path| [ path.sub(HUB_CODE, "").delete_suffix(".rb").camelize, path[HUB_FOLDER, 1].to_sym ] }
+      @folder_classes = {}
+      read_folders(folder_files)
       @shared = shared
       @host_layer = host_layer
       @interfaces = interfaces
@@ -16,6 +17,11 @@ module HubKernel
     def in(path, source)
       hub = owner_of_file(path)
       source.scan(/[A-Z]\w*(?:::[A-Z]\w*)*/).filter_map { |name| owned_class_in(name) }.uniq.select { |name| crossing?(name, hub) }
+    end
+
+    def read_folders(paths)
+      @folder_classes.merge!(paths.to_h { |path| [ path.sub(HUB_CODE, "").delete_suffix(".rb").camelize, path[HUB_FOLDER, 1].to_sym ] })
+      self
     end
 
     def belongs?(path) = !owner_of_file(path).nil?
