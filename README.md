@@ -269,6 +269,9 @@ end
   hub's folder is owned by two hubs. A class the map still lists whose file already sits
   in that hub's folder fails with "Shop::Purchase sits in its hub's folder, so take it off
   the list".
+- It fails naming each folder under `hubs/` that holds no module extending
+  `HubKernel::Ports` or `HubKernel::Exposes`, such as "hubs/suplies holds no hub module",
+  so a misspelled or half-made hub folder does not pass unnoticed.
 
 ## Installation
 Add this line to your application's Gemfile:

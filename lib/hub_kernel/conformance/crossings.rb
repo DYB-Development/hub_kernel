@@ -40,6 +40,11 @@ module HubKernel
           assert listed.empty?, listed.map { |name| "#{name} sits in its hub's folder, so take it off the list" }.join("\n")
         end
 
+        test "every hub folder holds a hub module" do
+          bare = the_crossings.folders_without_hub_module
+          assert bare.empty?, bare.map { |folder| "#{folder} holds no hub module" }.join("\n")
+        end
+
         test "every class the map names exists" do
           missing = the_crossings.missing_classes
           assert missing.empty?, missing.map { |name| "The map names #{name}, which does not exist" }.join("\n")

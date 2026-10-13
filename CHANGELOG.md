@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 ### Added
+- The crossing check fails naming each folder under `hubs/` that holds no hub module.
 - The crossing check reports a class the host's list gives one hub while its file sits in another hub's folder as owned by two hubs, and fails naming each listed class already in its own hub's folder. A class in a hub folder is never reported as missing.
 - The crossing check finds a hub's interface module in its folder, as the module that extends `HubKernel::Ports` or `HubKernel::Exposes`, so a hub in a folder needs no `interfaces` entry.
 - A hub folder's `views` are searched after the host's own, and its `helpers` join the host's helper paths.
