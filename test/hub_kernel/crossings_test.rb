@@ -152,5 +152,11 @@ module HubKernel
 
       assert_equal [ "Billing::Invoice" ], crossings.in("app/models/shop/purchase.rb", "Billing::Invoice.create!(name: name)")
     end
+
+    test "a class on the shared list named from a hub's folder names no crossing" do
+      crossings = HubKernel::Crossings.new(owners: OWNERS, shared: %w[Shop::Expense])
+
+      assert_empty crossings.in("hubs/supplies/app/models/shop/purchase.rb", "Shop::Expense.create!(name: name)")
+    end
   end
 end
