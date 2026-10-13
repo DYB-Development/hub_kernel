@@ -16,4 +16,8 @@ class HubKernel::HubFoldersTest < ActiveSupport::TestCase
       assert_empty HubKernel::HubFolders.code_paths(Pathname(root))
     end
   end
+
+  test "a class in a hub folder loads when its namespace module is defined in the host's app/models" do
+    assert_equal "Storefront::Cart", "Storefront::Cart".constantize.name
+  end
 end
