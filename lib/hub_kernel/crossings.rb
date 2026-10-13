@@ -3,8 +3,10 @@ require "active_support/core_ext/string/inflections"
 module HubKernel
   class Crossings
     HUB_FOLDER = %r{\Ahubs/([^/]+)/}
-    def initialize(owners:, shared: [], host_layer: nil, interfaces: {}, namespaces: {})
+    HUB_CODE = %r{\Ahubs/[^/]+/app/[^/]+/}
+    def initialize(owners:, shared: [], host_layer: nil, interfaces: {}, namespaces: {}, folder_files: [])
       @owners = owners
+      @folder_classes = folder_files.to_h { |path| [ path.sub(HUB_CODE, "").delete_suffix(".rb").camelize, path[HUB_FOLDER, 1].to_sym ] }
       @shared = shared
       @host_layer = host_layer
       @interfaces = interfaces
@@ -47,7 +49,7 @@ module HubKernel
       space && "#{space}::#{name.delete_prefix("#{space}::").split("::").first}"
     end
 
-    def listed_owner_of(class_name) = @interfaces.key(class_name) || @owners.find { |_hub, classes| classes.include?(class_name) }&.first
+    def listed_owner_of(class_name) = @interfaces.key(class_name) || @folder_classes[class_name] || @owners.find { |_hub, classes| classes.include?(class_name) }&.first
 
     def owner_of(class_name) = listed_owner_of(class_name) || owner_of_namespace(class_name)
 
