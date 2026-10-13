@@ -43,7 +43,9 @@ module HubKernel
 
       def crossing_paths = (Dir.glob(crossing_files, base: crossing_root) - crossing_exceptions).sort
 
-      def the_crossings = @the_crossings ||= built_crossings.read_folders(Dir.glob("hubs/*/app/**/*.rb", base: crossing_root))
+      def the_crossings = @the_crossings ||= built_crossings.read_folders(hub_files).read_hub_modules(hub_files.to_h { |path| [ path, File.read(File.join(crossing_root, path)) ] })
+
+      def hub_files = @hub_files ||= Dir.glob("hubs/*/app/**/*.rb", base: crossing_root)
     end
   end
 end

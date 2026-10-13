@@ -91,6 +91,15 @@ module HubKernel
         end
       end
 
+      test "the crossing check finds each hub's interface module in its folder with no interface map passed" do
+        Dir.mktmpdir do |root|
+          write(root, "hubs/supplies/app/models/shop/hubs/supplies.rb", "module Shop::Hubs::Supplies\n  extend HubKernel::Ports\nend\n")
+          write(root, "app/models/shop/home.rb", "Shop::Hubs::Supplies.purchases")
+
+          assert_nil crossing_check_failure(root, owners: { shop: %w[Shop::Home] }, host_layer: :shop)
+        end
+      end
+
       private
 
       def write(root, path, source)
@@ -100,10 +109,10 @@ module HubKernel
 
       def crossing_check_failure(root, **options) = crossing_check_run(root, **options).failures.first&.message
 
-      def crossing_check_run(root, test: "no file names a class another hub owns", owners: OWNERS, **options)
+      def crossing_check_run(root, test: "no file names a class another hub owns", owners: OWNERS, host_layer: nil, **options)
         check = Class.new(ActiveSupport::TestCase) { include HubKernel::Conformance::Crossings }
         Minitest::Runnable.runnables.delete(check)
-        check.crossings(root: root, **options) { HubKernel::Crossings.new(owners: owners) }
+        check.crossings(root: root, **options) { HubKernel::Crossings.new(owners: owners, host_layer: host_layer) }
         check.new("test_#{test.tr(" ", "_")}").run
       end
     end

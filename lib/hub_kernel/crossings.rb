@@ -4,6 +4,7 @@ module HubKernel
   class Crossings
     HUB_FOLDER = %r{\Ahubs/([^/]+)/}
     HUB_CODE = %r{\Ahubs/[^/]+/app/[^/]+/}
+    HUB_MODULE = /extend HubKernel::(Ports|Exposes)\b/
     def initialize(owners: {}, shared: [], host_layer: nil, interfaces: {}, namespaces: {}, folder_files: [])
       @owners = owners
       @folder_classes = {}
@@ -20,7 +21,16 @@ module HubKernel
     end
 
     def read_folders(paths)
-      @folder_classes.merge!(paths.to_h { |path| [ path.sub(HUB_CODE, "").delete_suffix(".rb").camelize, path[HUB_FOLDER, 1].to_sym ] })
+      @folder_classes.merge!(paths.to_h { |path| [ folder_class_of(path), path[HUB_FOLDER, 1].to_sym ] })
+      self
+    end
+
+    def read_hub_modules(sources)
+      sources.each do |path, source|
+        next unless source.match?(HUB_MODULE) && path.match?(HUB_CODE)
+
+        @interfaces = @interfaces.merge(path[HUB_FOLDER, 1].to_sym => folder_class_of(path))
+      end
       self
     end
 
@@ -35,6 +45,8 @@ module HubKernel
     def missing_classes = @owners.values.flatten.uniq.reject(&:safe_constantize)
 
     private
+
+    def folder_class_of(path) = path.sub(HUB_CODE, "").delete_suffix(".rb").camelize
 
     def class_of(path) = path.sub(%r{\Aapp/[^/]+/}, "").delete_suffix(".rb").camelize
 

@@ -253,7 +253,9 @@ end
 - A view belongs to the hub that owns its controller, then to the hub that owns the
   record its folder is named after, and otherwise to the `host_layer`.
 - The host's layer may name any hub's interface module, and a hub naming another hub's
-  interface module is a crossing.
+  interface module is a crossing. A hub's interface module is found in its folder, as the
+  module there that extends `HubKernel::Ports` or `HubKernel::Exposes`, so a hub in a
+  folder needs no entry in `interfaces`.
 - The test fails with "The crossing check found no files to read" when none of the files
   it read belongs to a hub or the host's layer, so a wrong `files:` pattern or an empty
   map does not pass unnoticed.
