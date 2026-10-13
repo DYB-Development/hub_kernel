@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 ### Added
+- A hub folder's `views` are searched after the host's own, and its `helpers` join the host's helper paths.
 - The crossing check gives a file under `hubs/<hub>/`, and each class defined there, to that hub without an entry in `owners`. Naming a class from another hub's folder is a crossing.
 - The crossing check reads every `.rb` and `.erb` file under each hub folder's `app/` by default.
 - A hub in the host app can keep its code in `hubs/<hub>/app/<kind>/`. Each of those folders is added to the host's load and eager load paths, so its classes load by their full names. Files under a hub's `lib/` folder are not loaded.
