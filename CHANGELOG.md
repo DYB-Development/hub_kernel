@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.20.0] - 2026-10-13
+
 ### Added
 - The crossing check fails naming each folder under `hubs/` that holds no hub module.
 - The crossing check reports a class the host's list gives one hub while its file sits in another hub's folder as owned by two hubs, and fails naming each listed class already in its own hub's folder. A class in a hub folder is never reported as missing.
