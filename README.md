@@ -18,6 +18,12 @@ Inside a Rails engine gem it writes the hub under the gem's namespace, such as
 gemspec. It writes no hub check into the gem's tests, since the gem never fills its own
 ports.
 
+Run in an app, it writes the hub into its own folder, named after the last part of the
+hub's name: `Console::Hubs::Supplies` goes to
+`hubs/supplies/app/models/console/hubs/supplies.rb`, and its hub check to
+`test/hubs/supplies/console/hubs/supplies_test.rb`, which the app's normal test run
+reads.
+
 ### A hub folder in the host app
 A hub that lives in the host app can keep its code in its own folder,
 `hubs/<hub>/app/<kind>/`, laid out like the app's own `app/` folder:

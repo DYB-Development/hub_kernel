@@ -6,7 +6,7 @@ module HubKernel
       argument :ports, type: :array, default: [], banner: "port:method port:method"
 
       def create_hub
-        create_file "app/models/#{file_path}.rb", <<~RUBY
+        create_file "#{code_root}app/models/#{file_path}.rb", <<~RUBY
           module #{class_name}
             extend HubKernel::Ports
           #{port_lines}end
@@ -16,7 +16,7 @@ module HubKernel
       def create_hub_test
         return if gemspec
 
-        create_file "test/models/#{file_path}_test.rb", <<~RUBY
+        create_file "test/hubs/#{hub_folder}/#{file_path}_test.rb", <<~RUBY
           require "test_helper"
           require "hub_kernel/conformance/hub"
 
@@ -37,6 +37,10 @@ module HubKernel
       private
 
       def gemspec = Dir.glob("*.gemspec", base: destination_root).first
+
+      def code_root = gemspec ? "" : "hubs/#{hub_folder}/"
+
+      def hub_folder = file_path.split("/").last
 
       def port_lines
         return "" if ports.empty?
