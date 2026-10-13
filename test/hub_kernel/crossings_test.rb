@@ -196,5 +196,16 @@ module HubKernel
 
       assert_equal [ "hubs/suplies" ], crossings.folders_without_hub_module
     end
+
+    test "a file of the host's layer may name each of several hub modules found in one hub's folder" do
+      crossings = HubKernel::Crossings.new(owners: { console: %w[Console::Home] }, host_layer: :console,
+                                           folder_files: %w[hubs/operations/app/models/console/hubs/finance.rb hubs/operations/app/models/console/hubs/supplies.rb])
+      crossings.read_hub_modules(
+        "hubs/operations/app/models/console/hubs/finance.rb" => "module Console::Hubs::Finance\n  extend HubKernel::Ports\nend\n",
+        "hubs/operations/app/models/console/hubs/supplies.rb" => "module Console::Hubs::Supplies\n  extend HubKernel::Exposes\nend\n"
+      )
+
+      assert_empty crossings.in("app/models/console/home.rb", "Console::Hubs::Finance.spend; Console::Hubs::Supplies.purchases")
+    end
   end
 end
