@@ -1,9 +1,8 @@
+require "hub_kernel/hub_folders"
 require "active_support/core_ext/string/inflections"
 
 module HubKernel
   class Crossings
-    HUB_FOLDER = %r{\Ahubs/([^/]+)/}
-    HUB_CODE = %r{\Ahubs/[^/]+/app/[^/]+/}
     HUB_MODULE = /extend HubKernel::(Ports|Exposes)\b/
     def initialize(owners: {}, shared: [], host_layer: nil, interfaces: {}, namespaces: {}, folder_files: [])
       @owners = owners
@@ -21,15 +20,15 @@ module HubKernel
     end
 
     def read_folders(paths)
-      @folder_classes.merge!(paths.to_h { |path| [ folder_class_of(path), path[HUB_FOLDER, 1].to_sym ] })
+      @folder_classes.merge!(paths.to_h { |path| [ HubFolders.class_of(path), HubFolders.hub_of(path) ] })
       self
     end
 
     def read_hub_modules(sources)
       sources.each do |path, source|
-        next unless source.match?(HUB_MODULE) && path.match?(HUB_CODE)
+        next unless source.match?(HUB_MODULE) && path.match?(HubFolders::CODE_PATH)
 
-        @interfaces = @interfaces.merge(path[HUB_FOLDER, 1].to_sym => folder_class_of(path))
+        @interfaces = @interfaces.merge(HubFolders.hub_of(path) => HubFolders.class_of(path))
       end
       self
     end
@@ -37,7 +36,7 @@ module HubKernel
     def belongs?(path) = !owner_of_file(path).nil?
 
     def unowned_classes(paths)
-      paths.select { |path| path.end_with?(".rb") && !path.start_with?("app/views/") && !path.match?(HUB_FOLDER) }.map { |path| class_of(path) }.reject { |name| owner_of(name) }
+      paths.select { |path| path.end_with?(".rb") && !path.start_with?("app/views/") && !HubFolders.hub_of(path) }.map { |path| class_of(path) }.reject { |name| owner_of(name) }
     end
 
     def claimed_twice
@@ -47,13 +46,11 @@ module HubKernel
 
     def listed_in_their_folders = @owners.flat_map { |hub, classes| classes.select { |name| @folder_classes[name] == hub } }
 
-    def folders_without_hub_module = @folder_classes.values.uniq.reject { |hub| @interfaces.key?(hub) }.map { |hub| "hubs/#{hub}" }
+    def folders_without_hub_module = @folder_classes.values.uniq.reject { |hub| @interfaces.key?(hub) }.map { |hub| HubFolders.folder(hub) }
 
     def missing_classes = @owners.values.flatten.uniq.reject { |name| @folder_classes.key?(name) || name.safe_constantize }
 
     private
-
-    def folder_class_of(path) = path.sub(HUB_CODE, "").delete_suffix(".rb").camelize
 
     def class_of(path) = path.sub(%r{\Aapp/[^/]+/}, "").delete_suffix(".rb").camelize
 
@@ -81,7 +78,7 @@ module HubKernel
     def owner_of_namespace(class_name) = @namespaces.find { |_hub, spaces| spaces.any? { |space| class_name.start_with?("#{space}::") } }&.first
 
     def owner_of_file(path)
-      return Regexp.last_match(1).to_sym if path =~ HUB_FOLDER
+      return HubFolders.hub_of(path) if HubFolders.hub_of(path)
 
       return owner_of_view_folder(File.dirname(path.delete_prefix("app/views/")).camelize) if path.start_with?("app/views/")
 

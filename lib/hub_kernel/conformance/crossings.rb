@@ -1,5 +1,6 @@
 require "active_support/concern"
 require "hub_kernel/crossings"
+require "hub_kernel/hub_folders"
 
 module HubKernel
   module Conformance
@@ -7,7 +8,7 @@ module HubKernel
       extend ActiveSupport::Concern
 
       class_methods do
-        def crossings(root: nil, files: "{app,hubs/*/app}/**/*.{rb,erb}", except: [], &block)
+        def crossings(root: nil, files: "{app,#{HubKernel::HubFolders.code_glob}}/**/*.{rb,erb}", except: [], &block)
           define_method(:built_crossings, &block)
           define_method(:crossing_root) { root || Rails.root }
           define_method(:crossing_files) { files }
@@ -55,7 +56,7 @@ module HubKernel
 
       def the_crossings = @the_crossings ||= built_crossings.read_folders(hub_files).read_hub_modules(hub_files.to_h { |path| [ path, File.read(File.join(crossing_root, path)) ] })
 
-      def hub_files = @hub_files ||= Dir.glob("hubs/*/app/**/*.rb", base: crossing_root)
+      def hub_files = @hub_files ||= Dir.glob("#{HubKernel::HubFolders.code_glob}/**/*.rb", base: crossing_root)
     end
   end
 end

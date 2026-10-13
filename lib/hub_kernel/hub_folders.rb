@@ -1,9 +1,25 @@
 module HubKernel
   module HubFolders
-    def self.code_paths(root) = Dir[root.join("hubs/*/app/*")]
+    ROOT = "hubs".freeze
+    CODE = "app".freeze
 
-    def self.view_paths(root) = Dir[root.join("hubs/*/app/views")]
+    PATH = %r{\A#{ROOT}/([^/]+)/}
+    CODE_PATH = %r{\A#{ROOT}/[^/]+/#{CODE}/[^/]+/}
 
-    def self.helper_paths(root) = Dir[root.join("hubs/*/app/helpers")]
+    def self.folder(hub) = "#{ROOT}/#{hub}"
+
+    def self.test_folder(hub) = "test/#{folder(hub)}"
+
+    def self.code_glob = "#{ROOT}/*/#{CODE}"
+
+    def self.hub_of(path) = path[PATH, 1]&.to_sym
+
+    def self.class_of(path) = path.sub(CODE_PATH, "").delete_suffix(".rb").camelize
+
+    def self.code_paths(root) = Dir[root.join("#{code_glob}/*")]
+
+    def self.view_paths(root) = Dir[root.join("#{code_glob}/views")]
+
+    def self.helper_paths(root) = Dir[root.join("#{code_glob}/helpers")]
   end
 end
