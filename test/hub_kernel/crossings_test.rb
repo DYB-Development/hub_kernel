@@ -122,5 +122,11 @@ module HubKernel
 
       assert_equal [ "Shop::Expense" ], crossings.in("hubs/supplies/app/models/shop/purchase.rb", "Shop::Expense.create!(name: name)")
     end
+
+    test "a class defined in a hub's folder is not reported as owned by no hub" do
+      crossings = HubKernel::Crossings.new(owners: {})
+
+      assert_empty crossings.unowned_classes([ "hubs/supplies/app/models/shop/purchase.rb" ])
+    end
   end
 end

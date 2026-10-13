@@ -21,7 +21,7 @@ module HubKernel
     def belongs?(path) = !owner_of_file(path).nil?
 
     def unowned_classes(paths)
-      paths.select { |path| path.end_with?(".rb") && !path.start_with?("app/views/") }.map { |path| class_of(path) }.reject { |name| owner_of(name) }
+      paths.select { |path| path.end_with?(".rb") && !path.start_with?("app/views/") && !path.match?(HUB_FOLDER) }.map { |path| class_of(path) }.reject { |name| owner_of(name) }
     end
 
     def claimed_twice = @owners.values.flatten.tally.select { |_name, hubs| hubs > 1 }.keys
