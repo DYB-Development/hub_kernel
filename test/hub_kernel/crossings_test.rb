@@ -217,5 +217,15 @@ module HubKernel
 
       assert_equal [ "Console::Hubs::Finance" ], crossings.in("hubs/sales/app/models/shop/quote.rb", "Console::Hubs::Finance.spend")
     end
+
+    test "a file in the same hub folder that names another of its hub modules names no crossing" do
+      crossings = HubKernel::Crossings.new(folder_files: %w[hubs/operations/app/models/console/hubs/finance.rb hubs/operations/app/models/console/hubs/supplies.rb])
+      crossings.read_hub_modules(
+        "hubs/operations/app/models/console/hubs/finance.rb" => "module Console::Hubs::Finance\n  extend HubKernel::Ports\nend\n",
+        "hubs/operations/app/models/console/hubs/supplies.rb" => "module Console::Hubs::Supplies\n  extend HubKernel::Exposes\nend\n"
+      )
+
+      assert_empty crossings.in("hubs/operations/app/models/console/hubs/finance.rb", "Console::Hubs::Supplies.purchases")
+    end
   end
 end
