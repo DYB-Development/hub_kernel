@@ -36,6 +36,12 @@ module may be defined in `app/models/` or in another hub's folder. A host with n
 
 Files under a hub's `lib/` folder, such as its generated event pack, are not loaded.
 
+A hub folder's `views` are searched after the host's `app/views`, so a controller in the
+hub renders its templates from there, any view can render a hub partial by its usual
+path, and a template in `app/views` wins over one at the same path in a hub folder. A
+hub folder's `helpers` are added to the host's helper paths, so they are available
+wherever every helper is.
+
 ### Using a hub from a gem
 The app that installs the gem fills each of the hub's ports in its own setup, then
 runs the start check:
