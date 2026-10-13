@@ -24,4 +24,8 @@ class HubKernel::HubFoldersTest < ActiveSupport::TestCase
   test "an event definition in a hub folder loads by its class name" do
     assert_equal "Billing::InvoiceSent", "Billing::InvoiceSent".constantize.name
   end
+
+  test "files under a hub folder's lib folder are not loaded as code" do
+    assert_not Object.const_defined?(:BillingEvents)
+  end
 end
