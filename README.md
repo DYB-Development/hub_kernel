@@ -227,6 +227,11 @@ class HubCrossingsTest < ActiveSupport::TestCase
 end
 ```
 
+- A file under a hub's folder, `hubs/<hub>/`, belongs to that hub, and so does each class
+  defined there, without any entry in `owners`. `owners` is only asked about files and
+  classes outside every hub folder, and may be left out once every hub has its folder.
+- By default the test reads every `.rb` and `.erb` file under `app/` and under each hub
+  folder's `app/`, helpers and services included.
 - A constant inside another hub's class counts as naming that class.
 - A name no hub owns, such as a namespace, is not a crossing, and neither is a class on
   the `shared` list.
