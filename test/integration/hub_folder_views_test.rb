@@ -12,4 +12,10 @@ class HubFolderViewsTest < ActionDispatch::IntegrationTest
 
     assert_select ".statement-summary", "Summary"
   end
+
+  test "a template at the same path in the host's views and a hub folder renders from the host's views" do
+    get "/receipt"
+
+    assert_select ".which", "From the host"
+  end
 end
