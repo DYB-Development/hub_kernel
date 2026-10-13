@@ -10,4 +10,10 @@ class HubKernel::HubFoldersTest < ActiveSupport::TestCase
 
     assert_nil Billing.autoload?(:ReminderJob)
   end
+
+  test "a host with no hubs folder adds no hub folders to its load paths" do
+    Dir.mktmpdir do |root|
+      assert_empty HubKernel::HubFolders.code_paths(Pathname(root))
+    end
+  end
 end
