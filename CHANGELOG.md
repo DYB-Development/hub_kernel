@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.21.0] - 2026-10-13
+
 ### Added
 - A hub folder may hold several hub modules, and the crossing check counts every one of them as that hub's interface module.
 
