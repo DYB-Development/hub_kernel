@@ -6,4 +6,10 @@ class HubFolderViewsTest < ActionDispatch::IntegrationTest
 
     assert_select "p", "Statement"
   end
+
+  test "a partial in a hub folder's views renders from a host view that calls it by its usual path" do
+    get "/receipt"
+
+    assert_select ".statement-summary", "Summary"
+  end
 end
