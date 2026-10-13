@@ -178,5 +178,11 @@ module HubKernel
 
       assert_equal [ "Console::Purchase" ], crossings.claimed_twice
     end
+
+    test "a class still on the host's list whose file sits in the folder of the hub it is listed under is reported" do
+      crossings = HubKernel::Crossings.new(owners: { supplies: %w[Console::Purchase] }, folder_files: [ "hubs/supplies/app/models/console/purchase.rb" ])
+
+      assert_equal [ "Console::Purchase" ], crossings.listed_in_their_folders
+    end
   end
 end

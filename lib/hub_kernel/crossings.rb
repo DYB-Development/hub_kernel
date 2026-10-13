@@ -45,6 +45,8 @@ module HubKernel
       listed.tally.select { |_name, hubs| hubs > 1 }.keys | @owners.flat_map { |hub, classes| classes.select { |name| @folder_classes.fetch(name, hub) != hub } }
     end
 
+    def listed_in_their_folders = @owners.flat_map { |hub, classes| classes.select { |name| @folder_classes[name] == hub } }
+
     def missing_classes = @owners.values.flatten.uniq.reject(&:safe_constantize)
 
     private
