@@ -264,7 +264,11 @@ end
   own Shop::Receipt".
 - It fails naming each class the map names that no longer exists in the app, such as "The
   map names Shop::Ghost, which does not exist", so a renamed or removed class does not
-  stay in the map.
+  stay in the map. A class whose file sits in a hub folder is never reported this way.
+- While hubs move into folders, a class the map gives one hub whose file sits in another
+  hub's folder is owned by two hubs. A class the map still lists whose file already sits
+  in that hub's folder fails with "Shop::Purchase sits in its hub's folder, so take it off
+  the list".
 
 ## Installation
 Add this line to your application's Gemfile:
