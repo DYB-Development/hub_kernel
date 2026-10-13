@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 ### Added
+- The crossing check finds a hub's interface module in its folder, as the module that extends `HubKernel::Ports` or `HubKernel::Exposes`, so a hub in a folder needs no `interfaces` entry.
 - A hub folder's `views` are searched after the host's own, and its `helpers` join the host's helper paths.
 - The crossing check gives a file under `hubs/<hub>/`, and each class defined there, to that hub without an entry in `owners`. Naming a class from another hub's folder is a crossing.
 - The crossing check reads every `.rb` and `.erb` file under each hub folder's `app/` by default.
