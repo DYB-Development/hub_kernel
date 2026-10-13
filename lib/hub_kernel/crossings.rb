@@ -40,7 +40,10 @@ module HubKernel
       paths.select { |path| path.end_with?(".rb") && !path.start_with?("app/views/") && !path.match?(HUB_FOLDER) }.map { |path| class_of(path) }.reject { |name| owner_of(name) }
     end
 
-    def claimed_twice = @owners.values.flatten.tally.select { |_name, hubs| hubs > 1 }.keys
+    def claimed_twice
+      listed = @owners.values.flatten
+      listed.tally.select { |_name, hubs| hubs > 1 }.keys | @owners.flat_map { |hub, classes| classes.select { |name| @folder_classes.fetch(name, hub) != hub } }
+    end
 
     def missing_classes = @owners.values.flatten.uniq.reject(&:safe_constantize)
 

@@ -172,5 +172,11 @@ module HubKernel
 
       assert_equal [ "Console::Hubs::Supplies" ], crossings.in("hubs/finance/app/models/shop/expense.rb", "Console::Hubs::Supplies.purchases")
     end
+
+    test "a class the host's list gives one hub while its file sits in another hub's folder is owned twice" do
+      crossings = HubKernel::Crossings.new(owners: { supplies: %w[Console::Purchase] }, folder_files: [ "hubs/finance/app/models/console/purchase.rb" ])
+
+      assert_equal [ "Console::Purchase" ], crossings.claimed_twice
+    end
   end
 end
