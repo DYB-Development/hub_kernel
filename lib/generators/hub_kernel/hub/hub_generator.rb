@@ -16,7 +16,7 @@ module HubKernel
       def create_hub_test
         return if gemspec
 
-        create_file "test/models/#{file_path}_test.rb", <<~RUBY
+        create_file "test/hubs/#{hub_folder}/#{file_path}_test.rb", <<~RUBY
           require "test_helper"
           require "hub_kernel/conformance/hub"
 

@@ -23,7 +23,7 @@ module HubKernel
     test "the generated hub test includes hub_kernel's hub check for the hub" do
       run_generator [ "Billing" ]
 
-      assert_file "test/models/billing_test.rb", /class BillingTest < ActiveSupport::TestCase\n  include HubKernel::Conformance::Hub\n\n  hub { Billing }\nend/
+      assert_file "test/hubs/billing/billing_test.rb", /class BillingTest < ActiveSupport::TestCase\n  include HubKernel::Conformance::Hub\n\n  hub { Billing }\nend/
     end
 
     test "a namespaced hub is generated at the matching nested path" do
@@ -35,7 +35,7 @@ module HubKernel
     test "a namespaced hub's test is generated at the matching nested path" do
       run_generator [ "Console::Hubs::Billing" ]
 
-      assert_file "test/models/console/hubs/billing_test.rb", /class Console::Hubs::BillingTest < ActiveSupport::TestCase\n/
+      assert_file "test/hubs/billing/console/hubs/billing_test.rb", /class Console::Hubs::BillingTest < ActiveSupport::TestCase\n/
     end
 
     test "a generated hub loads and calls whatever the app filled its port with" do
