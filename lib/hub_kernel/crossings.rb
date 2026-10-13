@@ -11,6 +11,7 @@ module HubKernel
       @shared = shared
       @host_layer = host_layer
       @interfaces = interfaces
+      @folder_interfaces = {}
       @namespaces = namespaces
     end
 
@@ -28,7 +29,7 @@ module HubKernel
       sources.each do |path, source|
         next unless source.match?(HUB_MODULE) && path.match?(HubFolders::CODE_PATH)
 
-        @interfaces = @interfaces.merge(HubFolders.hub_of(path) => HubFolders.class_of(path))
+        @folder_interfaces[HubFolders.class_of(path)] = HubFolders.hub_of(path)
       end
       self
     end
@@ -46,7 +47,7 @@ module HubKernel
 
     def listed_in_their_folders = @owners.flat_map { |hub, classes| classes.select { |name| @folder_classes[name] == hub } }
 
-    def folders_without_hub_module = @folder_classes.values.uniq.reject { |hub| @interfaces.key?(hub) }.map { |hub| HubFolders.folder(hub) }
+    def folders_without_hub_module = @folder_classes.values.uniq.reject { |hub| @interfaces.key?(hub) || @folder_interfaces.value?(hub) }.map { |hub| HubFolders.folder(hub) }
 
     def missing_classes = @owners.values.flatten.uniq.reject { |name| @folder_classes.key?(name) || name.safe_constantize }
 
@@ -57,7 +58,7 @@ module HubKernel
     def crossing?(name, hub)
       return false if @shared.include?(name) || owner_of(name) == hub
 
-      !(hub == @host_layer && @interfaces.value?(name))
+      !(hub == @host_layer && interface?(name))
     end
 
     def owned_class_in(name)
@@ -71,7 +72,9 @@ module HubKernel
       space && "#{space}::#{name.delete_prefix("#{space}::").split("::").first}"
     end
 
-    def listed_owner_of(class_name) = @interfaces.key(class_name) || @folder_classes[class_name] || @owners.find { |_hub, classes| classes.include?(class_name) }&.first
+    def interface?(name) = @interfaces.value?(name) || @folder_interfaces.key?(name)
+
+    def listed_owner_of(class_name) = @interfaces.key(class_name) || @folder_interfaces[class_name] || @folder_classes[class_name] || @owners.find { |_hub, classes| classes.include?(class_name) }&.first
 
     def owner_of(class_name) = listed_owner_of(class_name) || owner_of_namespace(class_name)
 
