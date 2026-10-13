@@ -140,5 +140,11 @@ module HubKernel
 
       assert_empty crossings.in("hubs/supplies/app/models/shop/purchase.rb", "Shop::Consumable.find(id)")
     end
+
+    test "a file in a hub's folder that names a class the host's list gives another hub names a crossing" do
+      crossings = HubKernel::Crossings.new(owners: OWNERS)
+
+      assert_equal [ "Shop::Expense" ], crossings.in("hubs/supplies/app/models/shop/purchase.rb", "Shop::Expense.create!(name: name)")
+    end
   end
 end
