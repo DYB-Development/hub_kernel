@@ -18,6 +18,24 @@ Inside a Rails engine gem it writes the hub under the gem's namespace, such as
 gemspec. It writes no hub check into the gem's tests, since the gem never fills its own
 ports.
 
+### A hub folder in the host app
+A hub that lives in the host app can keep its code in its own folder,
+`hubs/<hub>/app/<kind>/`, laid out like the app's own `app/` folder:
+
+```
+hubs/billing/app/models/billing/invoice.rb
+hubs/billing/app/jobs/billing/reminder_job.rb
+hubs/billing/app/event_definitions/billing/invoice_sent.rb
+```
+
+hub_kernel adds each of those folders to the host's load paths, so a class there loads
+by its full name, `Billing::Invoice`, just as it would from `app/models/`. Moving a
+class into its hub's folder changes nothing for the code that calls it. A namespace
+module may be defined in `app/models/` or in another hub's folder. A host with no
+`hubs/` folder loads exactly what it loads today.
+
+Files under a hub's `lib/` folder, such as its generated event pack, are not loaded.
+
 ### Using a hub from a gem
 The app that installs the gem fills each of the hub's ports in its own setup, then
 runs the start check:
