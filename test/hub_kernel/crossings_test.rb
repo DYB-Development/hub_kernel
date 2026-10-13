@@ -134,5 +134,11 @@ module HubKernel
 
       assert_equal [ "Shop::Expense" ], crossings.in("hubs/supplies/app/models/shop/purchase.rb", "Shop::Expense.create!(name: name)")
     end
+
+    test "a file in a hub's folder that names a class from the same folder names no crossing" do
+      crossings = HubKernel::Crossings.new(folder_files: [ "hubs/supplies/app/models/shop/consumable.rb" ])
+
+      assert_empty crossings.in("hubs/supplies/app/models/shop/purchase.rb", "Shop::Consumable.find(id)")
+    end
   end
 end
