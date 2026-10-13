@@ -116,6 +116,14 @@ module HubKernel
         end
       end
 
+      test "the crossing check passes a hub folder that holds a hub module" do
+        Dir.mktmpdir do |root|
+          write(root, "hubs/supplies/app/models/shop/hubs/supplies.rb", "module Shop::Hubs::Supplies\n  extend HubKernel::Ports\nend\n")
+
+          assert_nil crossing_check_failure(root, test: "every hub folder holds a hub module")
+        end
+      end
+
       private
 
       def write(root, path, source)
