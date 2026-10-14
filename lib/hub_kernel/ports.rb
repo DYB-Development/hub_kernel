@@ -16,6 +16,7 @@ module HubKernel
     def record_port(name)
       Hubs.add(self)
       declared_ports << name
+      record_ports << name
       singleton_class.attr_accessor name
     end
 
@@ -30,9 +31,19 @@ module HubKernel
         .map { |name| "#{hub_name} #{name.to_s.tr("_", " ")} is filled with something that cannot be called" }
     end
 
+    def unmodelled_ports
+      record_ports.select { |name| instance_variable_get(:"@#{name}") }
+        .reject { |name| active_record_model?(instance_variable_get(:"@#{name}")) }
+        .map { |name| "#{hub_name} #{name.to_s.tr("_", " ")} is filled with something that is not an Active Record model" }
+    end
+
     private
 
     def declared_ports = @declared_ports ||= []
+
+    def record_ports = @record_ports ||= []
+
+    def active_record_model?(filling) = filling.is_a?(Class) && filling < ActiveRecord::Base
 
     def unwired(name)
       ->(*, **) { raise UnwiredPortError, unwired_message(name) }
