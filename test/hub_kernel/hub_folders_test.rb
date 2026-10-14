@@ -37,6 +37,14 @@ class HubKernel::HubFoldersTest < ActiveSupport::TestCase
     end
   end
 
+  test "no hub folder is named when none holds the page's controller" do
+    Dir.mktmpdir do |root|
+      write_controller(root, "billing", "billing/invoices")
+
+      assert_nil HubKernel::HubFolders.hub_of_controller(Pathname(root), "accounts/plans")
+    end
+  end
+
   private
 
   def write_controller(root, hub, page)

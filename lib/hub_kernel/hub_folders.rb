@@ -24,7 +24,7 @@ module HubKernel
 
     def self.hub_of_controller(root, page)
       controller = Dir[root.join(code_glob, "controllers", "#{page}_controller.rb").to_s].first
-      hub_of(Pathname(controller).relative_path_from(root).to_s)
+      controller && hub_of(Pathname(controller).relative_path_from(root).to_s)
     end
   end
 end
