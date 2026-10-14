@@ -2,12 +2,14 @@
 
 ## [Unreleased]
 
+### Added
+- Has-many links through a record port: a model declares `has_many_port :quotes, port: Sales, record: :quote_record` and gets an ordinary `has_many :quotes` whose class is the model the app filled the port with, defined once both the model has loaded and the port is filled, in whichever order. The link is always read-only: a listed record raises `ActiveRecord::ReadOnlyRecord` on save or destroy, adding to, removing from, assigning, building, creating or bulk-writing through the list raises, and `autosave`, `counter_cache` and a `dependent` value that destroys, deletes or nullifies raise an `ArgumentError`. `dependent: :restrict_with_exception` and `dependent: :restrict_with_error` are taken and still refuse deleting the model while the link lists records.
+
 ## [0.25.0] - 2026-10-14
 
 ### Added
 - Record ports: a hub declares `record_port :job_record` and the app fills it with an Active Record model class, such as `Fulfillment.job_record = Job`. The start check and the hub check name a record port left unfilled and one filled with something that is not an Active Record model, and kept ports gives a record port back the model it held before a test.
 - Links through a record port: a model declares `belongs_to_port :job, port: Sales, record: :job_record` and gets an ordinary `belongs_to :job` to the model the app filled the port with, defined once both the model has loaded and the port is filled, in whichever order. The link is always read-only: a record read through it raises `ActiveRecord::ReadOnlyRecord` on save or destroy, building or creating through it raises, and `autosave`, `dependent`, `touch` and `counter_cache` raise an `ArgumentError`.
-- Has-many links through a record port: a model declares `has_many_port :quotes, port: Sales, record: :quote_record` and gets an ordinary `has_many :quotes` whose class is the model the app filled the port with, defined once both the model has loaded and the port is filled, in whichever order. The link is always read-only: a listed record raises `ActiveRecord::ReadOnlyRecord` on save or destroy, adding to, removing from, assigning, building, creating or bulk-writing through the list raises, and `autosave`, `counter_cache` and a `dependent` value that destroys, deletes or nullifies raise an `ArgumentError`. `dependent: :restrict_with_exception` and `dependent: :restrict_with_error` are taken and still refuse deleting the model while the link lists records.
 
 ## [0.24.0] - 2026-10-14
 
