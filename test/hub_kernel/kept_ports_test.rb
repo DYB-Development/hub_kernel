@@ -37,6 +37,22 @@ module HubKernel
       assert_equal [ person_chooser, [ "Sales' payment lister is not wired" ], job_chooser ], [ Sales.person_chooser, Sales.unwired_ports, Finance.job_chooser ]
     end
 
+    test "a port a test empties or replaces holds the change while the test runs and its old filling after" do
+      person_chooser = -> { [] }
+      replacement = -> { [ :replaced ] }
+      Sales.person_chooser = person_chooser
+      Sales.payment_lister = person_chooser
+      during = nil
+
+      run_test_keeping(Sales) do
+        Sales.person_chooser = replacement
+        Sales.payment_lister = nil
+        during = [ Sales.person_chooser, Sales.unwired_ports ]
+      end
+
+      assert_equal [ [ replacement, [ "Sales' payment lister is not wired" ] ], [ person_chooser, [] ] ], [ during, [ Sales.person_chooser, Sales.unwired_ports ] ]
+    end
+
     private
 
     def run_test_keeping(*hubs, &body)
