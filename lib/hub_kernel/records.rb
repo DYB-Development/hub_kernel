@@ -7,10 +7,10 @@ module HubKernel
     end
 
     def removed(record)
-      record.destroy ? record.id : refuse(record)
+      record.destroy ? record.id : refuse(record, "deleted")
     end
 
-    def refuse(record, action = "saved")
+    def refuse(record, action)
       raise Refused, refusal(record, action)
     end
 
