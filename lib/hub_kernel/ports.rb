@@ -17,7 +17,14 @@ module HubKernel
       Hubs.add(self)
       declared_ports << name
       record_ports << name
-      singleton_class.attr_accessor name
+      singleton_class.attr_reader name
+      define_singleton_method(:"#{name}=") { |model| fill_record_port(name, model) }
+    end
+
+    def link_record(name, model_and_link, &link)
+      links_to(name)[model_and_link] = link
+      filling = public_send(name)
+      link.call(filling) if active_record_model?(filling)
     end
 
     def port_names = declared_ports.dup
@@ -42,6 +49,13 @@ module HubKernel
     def declared_ports = @declared_ports ||= []
 
     def record_ports = @record_ports ||= []
+
+    def links_to(name) = (@record_links ||= {})[name] ||= {}
+
+    def fill_record_port(name, model)
+      instance_variable_set(:"@#{name}", model)
+      links_to(name).each_value { |link| link.call(model) } if active_record_model?(model)
+    end
 
     def active_record_model?(filling) = filling.is_a?(Class) && filling < ActiveRecord::Base
 

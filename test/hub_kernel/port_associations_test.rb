@@ -8,6 +8,12 @@ module HubKernel
       record_port :job_record
     end
 
+    module Pipelines
+      extend HubKernel::Ports
+
+      record_port :job_record
+    end
+
     class Job < ActiveRecord::Base
       self.table_name = "port_jobs"
     end
@@ -27,6 +33,8 @@ module HubKernel
       connection.create_table(:port_quotes, force: true) { |table| table.references :job }
     end
 
+    teardown { Pipelines.job_record = nil }
+
     test "a model reads the record its link points at the way it reads any belongs_to" do
       job = Job.create!(name: "Roof")
 
@@ -44,6 +52,15 @@ module HubKernel
 
     test "a model that loads after its port is filled has the link as soon as it loads" do
       assert_equal Job, Quote.reflect_on_association(:job)&.klass
+    end
+
+    test "a model that loads before its port is filled has the link as soon as the port is filled" do
+      plan = self.class.const_set(:Plan, Class.new(ActiveRecord::Base) { self.table_name = "port_quotes" })
+      plan.belongs_to_port :job, port: Pipelines, record: :job_record
+
+      Pipelines.job_record = Job
+
+      assert_equal Job, plan.reflect_on_association(:job)&.klass
     end
 
     test "every option a belongs_to takes other than its class name reaches the association" do
