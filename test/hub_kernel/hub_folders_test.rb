@@ -45,6 +45,18 @@ class HubKernel::HubFoldersTest < ActiveSupport::TestCase
     end
   end
 
+  test "a controller held by two hub folders raises naming both folders" do
+    Dir.mktmpdir do |root|
+      write_controller(root, "billing", "plans")
+      write_controller(root, "sales", "plans")
+
+      error = assert_raises(HubKernel::HubFolders::SharedController) do
+        HubKernel::HubFolders.hub_of_controller(Pathname(root), "plans")
+      end
+      assert_match %r{hubs/billing.*hubs/sales}, error.message
+    end
+  end
+
   private
 
   def write_controller(root, hub, page)

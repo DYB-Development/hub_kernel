@@ -1,5 +1,7 @@
 module HubKernel
   module HubFolders
+    class SharedController < StandardError; end
+
     ROOT = "hubs".freeze
     CODE = "app".freeze
 
@@ -23,8 +25,11 @@ module HubKernel
     def self.helper_paths(root) = Dir[root.join("#{code_glob}/helpers")]
 
     def self.hub_of_controller(root, page)
-      controller = Dir[root.join(code_glob, "controllers", "#{page}_controller.rb").to_s].first
-      controller && hub_of(Pathname(controller).relative_path_from(root).to_s)
+      controllers = Dir[root.join(code_glob, "controllers", "#{page}_controller.rb").to_s].sort
+      hubs = controllers.map { |controller| hub_of(Pathname(controller).relative_path_from(root).to_s) }
+      raise SharedController, "#{page}_controller.rb is in more than one hub folder: #{hubs.map { folder(it) }.join(", ")}" if hubs.many?
+
+      hubs.first
     end
   end
 end
