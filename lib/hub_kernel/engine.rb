@@ -16,12 +16,6 @@ module HubKernel
       ActiveSupport.on_load(:action_controller) { append_view_path(views) }
     end
 
-    config.to_prepare do
-      Dir[Rails.root.join(HubFolders.code_glob, "**/*.rb")].each do |file|
-        next unless File.read(file).match?(/extend HubKernel::(Ports|Exposes)\b/)
-
-        HubFolders.class_of(Pathname(file).relative_path_from(Rails.root).to_s).constantize
-      end
-    end
+    config.to_prepare { HubFolders.hub_modules(Rails.root).each(&:constantize) }
   end
 end
