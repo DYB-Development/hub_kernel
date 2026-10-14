@@ -52,6 +52,12 @@ module HubKernel
         assert_nil hub_check_failure(Fulfillment)
       end
 
+      test "a record port filled with something that is not a model fails the hub check and is named" do
+        Fulfillment.job_record = "Job"
+
+        assert_equal "Fulfillment's job record is filled with something that is not an Active Record model", hub_check_failure(Fulfillment)
+      end
+
       private
 
       def hub_check_failure(hub)
