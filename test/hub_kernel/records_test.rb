@@ -38,5 +38,9 @@ module HubKernel
     test "a delete that fails is refused with the record's errors as one sentence" do
       assert_raises(HubKernel::Refused, match: /\AName can't be blank and Aisle can't be blank\z/) { Shop.clear(Shelf.new(id: 7)) }
     end
+
+    test "a hub's callers cannot save or delete through it" do
+      assert_empty Shop.public_methods & [ :saved, :removed ]
+    end
   end
 end

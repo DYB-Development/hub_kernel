@@ -1,5 +1,7 @@
 module HubKernel
   module Records
+    private
+
     def saved(record)
       record.save ? record.id : refuse(record)
     end
