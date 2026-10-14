@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.23.0] - 2026-10-14
+
 ### Added
 - A hub answers `port_names` with the names of the ports it declares, in the order it declares them.
 - Kept ports: a test that requires `hub_kernel/kept_ports` and includes `HubKernel::KeptPorts` has every port of the hubs it names in `keep_ports { [ Sales, Finance ] }` filled after each test as it was before it. A test that names no hubs keeps the ports of the hub it names in `hub { ... }` for the hub check.
