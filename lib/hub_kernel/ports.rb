@@ -13,6 +13,8 @@ module HubKernel
       define_singleton_method(as) { |*args, **options| public_send(name).call(*args, **options) }
     end
 
+    def port_names = declared_ports.dup
+
     def unwired_ports
       declared_ports.reject { |name| instance_variable_get(:"@#{name}") }.map { |name| unwired_message(name) }
     end

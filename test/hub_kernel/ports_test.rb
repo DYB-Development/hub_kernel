@@ -10,6 +10,13 @@ module HubKernel
       port :spend_recorder, as: :record_spend
     end
 
+    module Sales
+      extend HubKernel::Ports
+
+      port :person_chooser, as: :person_choices
+      port :payment_lister, as: :payments_on
+    end
+
     module Finance
       extend HubKernel::Ports
 
@@ -49,6 +56,10 @@ module HubKernel
       assert_raises(HubKernel::UnwiredPortError, match: "Finance's job chooser is not wired") do
         Finance.job_choices
       end
+    end
+
+    test "a hub answers with the names of the ports it declares in the order it declares them" do
+      assert_equal %i[person_chooser payment_lister], Sales.port_names
     end
 
     test "an app that requires hub_kernel can declare ports with no further require" do
