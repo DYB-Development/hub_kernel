@@ -34,5 +34,9 @@ module HubKernel
     test "a save that fails is refused with the record's errors as one sentence" do
       assert_raises(HubKernel::Refused, match: /\AName can't be blank and Aisle can't be blank\z/) { Shop.stock(Shelf.new(id: 7)) }
     end
+
+    test "a delete that fails is refused with the record's errors as one sentence" do
+      assert_raises(HubKernel::Refused, match: /\AName can't be blank and Aisle can't be blank\z/) { Shop.clear(Shelf.new(id: 7)) }
+    end
   end
 end
