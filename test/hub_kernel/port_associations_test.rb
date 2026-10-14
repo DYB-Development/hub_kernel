@@ -25,6 +25,7 @@ module HubKernel
 
       belongs_to_port :job, port: Sales, record: :job_record
       belongs_to_port :first_job, port: Sales, record: :job_record, foreign_key: :job_id, optional: true, inverse_of: false
+      belongs_to_port :roofing_job, -> { where(name: "Roof") }, port: Sales, record: :job_record, foreign_key: :job_id, optional: true
     end
 
     setup do
@@ -91,6 +92,13 @@ module HubKernel
       quote.update!(job: deck)
 
       assert_equal deck.id, Quote.find(quote.id).job_id
+    end
+
+    test "a scope the declaration passes is applied and the records it loads are still read-only" do
+      roof, deck = %w[Roof Deck].map { |name| Job.create!(name: name) }
+      quotes = [ roof, deck ].map { |job| Quote.create!(job: job) }
+
+      assert_equal [ [ "Roof", true ], nil ], quotes.map { |quote| Quote.find(quote.id).roofing_job&.then { |job| [ job.name, job.readonly? ] } }
     end
 
     private
