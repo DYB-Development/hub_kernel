@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Added
+- `HubKernel::HubFolders.hub_of_controller(root, page)` returns the hub whose folder holds `<page>_controller.rb`, returns nil when no hub folder holds it, and raises `HubKernel::HubFolders::SharedController` naming each folder when several hold it.
+
 ## [0.22.0] - 2026-10-14
 
 ### Added
