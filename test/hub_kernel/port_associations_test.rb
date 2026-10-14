@@ -135,6 +135,15 @@ module HubKernel
       assert_equal quotes, job.quotes.sort_by(&:id)
     end
 
+    test "listed records can be preloaded, joined, filtered and ordered on" do
+      roof, deck, shed = %w[Roof Deck Shed].map { |name| Job.create!(name: name) }
+      [ roof, deck, shed ].each { |job| Quote.create!(job_id: job.id, wanted: job.name) }
+
+      jobs = Job.includes(:quotes).joins(:quotes).where(quotes: { wanted: %w[Roof Deck] }).order(quotes: { wanted: :asc })
+
+      assert_equal [ [ "Deck" ], [ "Roof" ] ], jobs.map { |job| job.quotes.map(&:wanted) }
+    end
+
     private
 
     def refusal
