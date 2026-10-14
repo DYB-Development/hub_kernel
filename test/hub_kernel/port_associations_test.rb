@@ -205,7 +205,27 @@ module HubKernel
       assert_equal writing.map { |option, _| "quotes is a read-only record port link, so it does not take #{option}" }, refusals
     end
 
+    test "a has-many link that restricts deleting its owner refuses the delete while it lists records and allows it when it lists none" do
+      deleted = %i[restrict_with_exception restrict_with_error].map do |value|
+        model = self.class.const_set(:"Restricted#{value.to_s.camelize}", Class.new(ActiveRecord::Base) { self.table_name = "port_jobs" })
+        model.has_many_port :quotes, port: Sales, record: :quote_record, foreign_key: :job_id, dependent: value
+        listing, empty = Array.new(2) { model.create!(name: "Roof") }
+        Quote.create!(job_id: listing.id)
+
+        [ listing, empty ].map { |owner| deleted?(owner) }
+      end
+
+      assert_equal [ [ false, true ], [ false, true ] ], deleted
+    end
+
     private
+
+    def deleted?(owner)
+      owner.destroy
+      !owner.class.exists?(owner.id)
+    rescue ActiveRecord::DeleteRestrictionError
+      false
+    end
 
     def refusal
       yield
