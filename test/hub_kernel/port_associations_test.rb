@@ -68,5 +68,22 @@ module HubKernel
 
       assert_equal({ foreign_key: :job_id, optional: true, inverse_of: false }, options.slice(:foreign_key, :optional, :inverse_of))
     end
+
+    test "saving or destroying a record read through the link raises a read-only error" do
+      job = Job.create!(name: "Roof")
+      quote = Quote.create!(job_id: job.id)
+      linked = [ Quote.find(quote.id).job, Quote.preload(:job).find(quote.id).job, Quote.eager_load(:job).find(quote.id).job ]
+
+      assert_equal [ ActiveRecord::ReadOnlyRecord ] * 6, linked.flat_map { |record| [ refusal { record.update!(name: "Deck") }, refusal { record.destroy } ] }
+    end
+
+    private
+
+    def refusal
+      yield
+      nil
+    rescue ActiveRecord::ActiveRecordError => error
+      error.class
+    end
   end
 end
