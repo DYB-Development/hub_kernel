@@ -77,6 +77,13 @@ module HubKernel
       assert_equal [ ActiveRecord::ReadOnlyRecord ] * 6, linked.flat_map { |record| [ refusal { record.update!(name: "Deck") }, refusal { record.destroy } ] }
     end
 
+    test "building or creating a linked record through the link raises a read-only error" do
+      quote = Quote.new
+      attempts = [ -> { quote.build_job(name: "Roof") }, -> { quote.create_job(name: "Roof") }, -> { quote.create_job!(name: "Roof") }, -> { quote.update(job: Job.new(name: "Roof")) } ]
+
+      assert_equal [ ActiveRecord::ReadOnlyRecord ] * 4, attempts.map { |attempt| refusal(&attempt) }
+    end
+
     private
 
     def refusal
