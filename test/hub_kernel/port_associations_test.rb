@@ -84,6 +84,15 @@ module HubKernel
       assert_equal [ ActiveRecord::ReadOnlyRecord ] * 4, attempts.map { |attempt| refusal(&attempt) }
     end
 
+    test "a model can set which record it links to and save itself" do
+      roof, deck = %w[Roof Deck].map { |name| Job.create!(name: name) }
+      quote = Quote.includes(:job).find(Quote.create!(job: roof).id)
+
+      quote.update!(job: deck)
+
+      assert_equal deck.id, Quote.find(quote.id).job_id
+    end
+
     private
 
     def refusal
