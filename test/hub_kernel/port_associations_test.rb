@@ -13,6 +13,7 @@ module HubKernel
       extend HubKernel::Ports
 
       record_port :job_record
+      record_port :quote_record
     end
 
     class Job < ActiveRecord::Base
@@ -41,7 +42,10 @@ module HubKernel
       connection.create_table(:port_quotes, force: true) { |table| table.references :job; table.string :wanted }
     end
 
-    teardown { Pipelines.job_record = nil }
+    teardown do
+      Pipelines.job_record = nil
+      Pipelines.quote_record = nil
+    end
 
     test "a model reads the record its link points at the way it reads any belongs_to" do
       job = Job.create!(name: "Roof")
@@ -156,6 +160,15 @@ module HubKernel
       crew.has_many_port :quotes, port: Sales, record: :quote_record, foreign_key: :job_id
 
       assert_equal Quote, crew.reflect_on_association(:quotes)&.klass
+    end
+
+    test "a model that loads before its port is filled has the has-many link as soon as the port is filled" do
+      team = self.class.const_set(:Team, Class.new(ActiveRecord::Base) { self.table_name = "port_jobs" })
+      team.has_many_port :quotes, port: Pipelines, record: :quote_record, foreign_key: :job_id
+
+      Pipelines.quote_record = Quote
+
+      assert_equal Quote, team.reflect_on_association(:quotes)&.klass
     end
 
     private
