@@ -151,6 +151,13 @@ module HubKernel
       assert_equal({ foreign_key: :job_id, inverse_of: false, validate: false, strict_loading: true }, options.slice(:foreign_key, :inverse_of, :validate, :strict_loading))
     end
 
+    test "a model that loads after its port is filled has the has-many link as soon as it loads" do
+      crew = self.class.const_set(:Crew, Class.new(ActiveRecord::Base) { self.table_name = "port_jobs" })
+      crew.has_many_port :quotes, port: Sales, record: :quote_record, foreign_key: :job_id
+
+      assert_equal Quote, crew.reflect_on_association(:quotes)&.klass
+    end
+
     private
 
     def refusal
