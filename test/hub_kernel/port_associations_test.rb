@@ -42,6 +42,10 @@ module HubKernel
       assert_equal [ deck, roof ], quotes.map(&:job)
     end
 
+    test "a model that loads after its port is filled has the link as soon as it loads" do
+      assert_equal Job, Quote.reflect_on_association(:job)&.klass
+    end
+
     test "every option a belongs_to takes other than its class name reaches the association" do
       options = Quote.reflect_on_association(:first_job).options
 
