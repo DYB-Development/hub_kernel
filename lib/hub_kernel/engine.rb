@@ -1,4 +1,5 @@
 require "hub_kernel/hub_folders"
+require "hub_kernel/port_associations"
 
 module HubKernel
   class Engine < ::Rails::Engine
@@ -14,6 +15,10 @@ module HubKernel
     initializer "hub_kernel.hub_views" do |app|
       views = HubFolders.view_paths(app.root)
       ActiveSupport.on_load(:action_controller) { append_view_path(views) }
+    end
+
+    initializer "hub_kernel.port_associations" do
+      ActiveSupport.on_load(:active_record) { extend HubKernel::PortAssociations }
     end
 
     config.to_prepare { HubFolders.hub_modules(Rails.root).each(&:constantize) }
