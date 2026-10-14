@@ -27,7 +27,7 @@ module HubKernel
     def self.hub_of_controller(root, page)
       controllers = Dir[root.join(code_glob, "controllers", "#{page}_controller.rb").to_s].sort
       hubs = controllers.map { |controller| hub_of(Pathname(controller).relative_path_from(root).to_s) }
-      raise SharedController, "#{page}_controller.rb is in more than one hub folder: #{hubs.map { folder(it) }.join(", ")}" if hubs.many?
+      raise SharedController, "#{page}_controller.rb is in more than one hub folder: #{hubs.map { |hub| folder(hub) }.join(", ")}" if hubs.many?
 
       hubs.first
     end
