@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Added
+- Record ports: a hub declares `record_port :job_record` and the app fills it with an Active Record model class, such as `Fulfillment.job_record = Job`. The start check and the hub check name a record port left unfilled and one filled with something that is not an Active Record model, and kept ports gives a record port back the model it held before a test.
+
 ## [0.24.0] - 2026-10-14
 
 ### Added

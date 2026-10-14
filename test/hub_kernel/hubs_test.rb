@@ -57,6 +57,31 @@ module HubKernel
       assert_equal 1, HubKernel::Hubs.list.count { |listed| listed.name == "Warehouse" }
     end
 
+    test "an app with an unfilled record port refuses to start and names the port with its hub" do
+      hub = Module.new { extend HubKernel::Ports }
+      hub.define_singleton_method(:name) { "Fulfillment" }
+      hub.record_port :job_record
+      Operations.resource_namer = ->(ids) { ids }
+      Operations.usage_reader = ->(ids) { ids }
+
+      assert_raises(HubKernel::UnwiredPortError, match: "Fulfillment's job record is not wired") do
+        HubKernel::Hubs.check!
+      end
+    end
+
+    test "an app with a record port filled with something that is not a model refuses to start and names the port" do
+      hub = Module.new { extend HubKernel::Ports }
+      hub.define_singleton_method(:name) { "Fulfillment" }
+      hub.record_port :job_record
+      hub.job_record = "Job"
+      Operations.resource_namer = ->(ids) { ids }
+      Operations.usage_reader = ->(ids) { ids }
+
+      assert_raises(HubKernel::UnwiredPortError, match: "Fulfillment's job record is filled with something that is not an Active Record model") do
+        HubKernel::Hubs.check!
+      end
+    end
+
     test "the refusal names every unfilled port" do
       error = assert_raises(HubKernel::UnwiredPortError) { HubKernel::Hubs.check! }
 

@@ -13,7 +13,7 @@ module HubKernel
 
       included do
         test "every port of the hub is filled with something that can be called" do
-          problems = the_hub.unwired_ports + the_hub.uncallable_ports
+          problems = the_hub.unwired_ports + the_hub.uncallable_ports + the_hub.unmodelled_ports
           flunk problems.join("\n") if problems.any?
         end
       end

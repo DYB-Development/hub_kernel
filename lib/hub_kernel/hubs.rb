@@ -14,7 +14,7 @@ module HubKernel
     def self.list = (registered + Interface::ExposingHubs.list).uniq { |hub| hub.name || hub }
 
     def self.check!
-      unwired = list.select { |hub| hub.respond_to?(:unwired_ports) }.flat_map(&:unwired_ports) + unfilled_host_answers
+      unwired = list.select { |hub| hub.respond_to?(:unwired_ports) }.flat_map { |hub| hub.unwired_ports + hub.unmodelled_ports } + unfilled_host_answers
       raise UnwiredPortError, unwired.join("\n") if unwired.any?
     end
 

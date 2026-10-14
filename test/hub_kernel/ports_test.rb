@@ -23,8 +23,18 @@ module HubKernel
       port :job_chooser, as: :job_choices
     end
 
+    module Fulfillment
+      extend HubKernel::Ports
+
+      record_port :job_record
+    end
+
+    class Job < ActiveRecord::Base
+    end
+
     teardown do
       Supplies.spend_recorder = nil
+      Fulfillment.job_record = nil
     end
 
     test "calling a filled port returns the answer of what the app filled it with" do
@@ -60,6 +70,12 @@ module HubKernel
 
     test "a hub answers with the names of the ports it declares in the order it declares them" do
       assert_equal %i[person_chooser payment_lister], Sales.port_names
+    end
+
+    test "a record port filled with a model class answers that model" do
+      Fulfillment.job_record = Job
+
+      assert_equal Job, Fulfillment.job_record
     end
 
     test "an app that requires hub_kernel can declare ports with no further require" do

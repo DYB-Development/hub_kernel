@@ -102,6 +102,30 @@ returns its answer. An error it raises reaches the caller unchanged. Calling a p
 app left unfilled raises `HubKernel::UnwiredPortError`, such as "Supplies' spend
 recorder is not wired".
 
+### Record ports
+A record port is a port the app fills with an Active Record model class, so a hub can
+name a model another part of the app owns without naming its class. The hub declares it
+by name:
+
+```ruby
+module Fulfillment
+  extend HubKernel::Ports
+
+  record_port :job_record
+end
+```
+
+The app fills it with the model, in the same setup as its other ports:
+
+```ruby
+Rails.application.config.to_prepare do
+  Fulfillment.job_record = Job
+end
+```
+
+`Fulfillment.job_record` then answers `Job`. A record port is on the hub's
+`port_names`, so the start check, the hub check and kept ports all read it.
+
 ### The start check
 Every hub that declares a port or exposes a method is on `HubKernel::Hubs.list`. Call
 `HubKernel::Hubs.check!` after the app fills its ports, and the app refuses to start
@@ -115,7 +139,9 @@ end
 ```
 
 It raises `HubKernel::UnwiredPortError` naming every unfilled port with its hub, one per
-line. Running it inside `to_prepare` checks again after every code reload, and a hub
+line. It also names each record port filled with something that is not an Active Record
+model, such as "Fulfillment's job record is filled with something that is not an Active
+Record model". Running it inside `to_prepare` checks again after every code reload, and a hub
 declared again on a reload stays on the list once.
 
 While any hub exposes a method, it also names the permission check or the account scope
@@ -136,8 +162,9 @@ class SuppliesHubTest < ActiveSupport::TestCase
 end
 ```
 
-The test fails and names each port the app left unfilled, and each port filled with
-something that cannot be called.
+The test fails and names each port the app left unfilled, each port filled with
+something that cannot be called, and each record port filled with something that is not
+an Active Record model.
 
 ### The exposed list
 The exposed list, calling by name, the permission check, the account scope and the errors
