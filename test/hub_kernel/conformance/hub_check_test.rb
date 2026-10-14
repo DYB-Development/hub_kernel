@@ -11,9 +11,19 @@ module HubKernel
         port :payment_lister, as: :payments_on
       end
 
+      module Fulfillment
+        extend HubKernel::Ports
+
+        record_port :job_record
+      end
+
+      class Job < ActiveRecord::Base
+      end
+
       teardown do
         Sales.person_chooser = nil
         Sales.payment_lister = nil
+        Fulfillment.job_record = nil
       end
 
       test "the hub check fails and names each port the app left unfilled" do
@@ -34,6 +44,12 @@ module HubKernel
         Sales.payment_lister = ->(job_id) { [ job_id ] }
 
         assert_nil hub_check_failure(Sales)
+      end
+
+      test "a record port filled with a model passes the hub check" do
+        Fulfillment.job_record = Job
+
+        assert_nil hub_check_failure(Fulfillment)
       end
 
       private

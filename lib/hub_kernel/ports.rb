@@ -27,7 +27,7 @@ module HubKernel
     end
 
     def uncallable_ports
-      declared_ports.select { |name| instance_variable_get(:"@#{name}")&.respond_to?(:call) == false }
+      (declared_ports - record_ports).select { |name| instance_variable_get(:"@#{name}")&.respond_to?(:call) == false }
         .map { |name| "#{hub_name} #{name.to_s.tr("_", " ")} is filled with something that cannot be called" }
     end
 
