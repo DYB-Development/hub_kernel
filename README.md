@@ -167,6 +167,52 @@ the app fills the port with.
 The model names only its own hub, so the crossing check passes it. The app's
 `to_prepare` block that fills the port is the one place both models are named.
 
+### Has-many links through a record port
+A hub's model lists the records another hub owns that point back at it with
+`has_many_port`, naming its own hub and one of that hub's record ports:
+
+```ruby
+module Sales
+  class Job < ApplicationRecord
+    has_many_port :quotes, port: Sales, record: :quote_record
+  end
+end
+```
+
+hub_kernel defines an ordinary `has_many :quotes` whose class is the model the app filled
+the port with. `job.quotes` lists the quotes, and `includes`, `preload`, `joins`, `where`
+and `order` work on the link as on any `has_many`. Every other `has_many` option, such as
+`foreign_key:` or `inverse_of:`, and a scope passed before the options, reach the
+association unchanged, apart from the options below that write to the listed records.
+The class name comes from the port, so one passed is not used.
+
+A has-many link is always read-only, and no option makes it writable:
+
+- A record listed through the link, loaded, preloaded or queried, raises
+  `ActiveRecord::ReadOnlyRecord` when it is saved or destroyed.
+- Adding a record to the list with `<<`, `push`, `append`, `concat` or `replace`, removing
+  one with `delete`, `destroy`, `delete_all`, `destroy_all` or `clear`, and building or
+  creating one with `build`, `new`, `create` or `create!` raise
+  `ActiveRecord::ReadOnlyRecord`, on the list and on a query made from it.
+- Assigning the list with `quotes=` or `quote_ids=` raises `ActiveRecord::ReadOnlyRecord`.
+- Writing the listed records all at once with `update_all`, `update_counters`, `insert`,
+  `insert!`, `insert_all`, `insert_all!`, `upsert` or `upsert_all` raises
+  `ActiveRecord::ReadOnlyRecord`.
+- `autosave`, `counter_cache` and a `dependent` value that destroys, deletes or nullifies
+  the listed records each write to them, so passing any of them raises an `ArgumentError`
+  naming it.
+
+`dependent: :restrict_with_exception` and `dependent: :restrict_with_error` write nothing
+to the listed records, so the link takes them. Deleting the model while the link lists
+records is refused, the first way by raising `ActiveRecord::DeleteRestrictionError` and
+the second by adding an error and returning false, and deleting it when the link lists
+none goes ahead.
+
+The link is defined as soon as both the model has loaded and the port is filled, in
+whichever order those happen, the same way as a `belongs_to_port` link. A boot with eager
+loading on defines it, and after a code reload in development the reloaded model lists
+the reloaded model the app fills the port with.
+
 ### The start check
 Every hub that declares a port or exposes a method is on `HubKernel::Hubs.list`. Call
 `HubKernel::Hubs.check!` after the app fills its ports, and the app refuses to start

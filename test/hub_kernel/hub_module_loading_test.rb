@@ -35,4 +35,18 @@ class HubKernel::HubModuleLoadingTest < ActiveSupport::TestCase
 
     assert_equal "true false", output.lines.last&.chomp
   end
+
+  test "a model in a hub folder has its has-many record port link when the app boots with eager loading on" do
+    read = "puts [ Rails.application.config.eager_load, Kitchen::Dish.reflect_on_association(:recipes)&.klass ].join(' ')"
+    output = Dir.chdir(Rails.root) { `CI=1 bin/rails runner -e test "#{read}" 2>&1` }
+
+    assert_equal "true Cookbook::Recipe", output.lines.last&.chomp
+  end
+
+  test "a model in a hub folder has its has-many record port link after a code reload in development, linked to the reloaded model" do
+    reload = "before = Kitchen::Dish.reflect_on_association(:recipes).klass; Rails.application.reloader.check = -> { true }; Rails.application.reloader.reload!; after = Kitchen::Dish.reflect_on_association(:recipes)&.klass; puts [ after.equal?(Cookbook::Recipe), after.equal?(before) ].join(' ')"
+    output = Dir.chdir(Rails.root) { `bin/rails runner -e development "#{reload}" 2>&1` }
+
+    assert_equal "true false", output.lines.last&.chomp
+  end
 end
