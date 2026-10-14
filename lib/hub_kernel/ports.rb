@@ -14,6 +14,8 @@ module HubKernel
     end
 
     def record_port(name)
+      Hubs.add(self)
+      declared_ports << name
       singleton_class.attr_accessor name
     end
 
