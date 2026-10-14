@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Changed
+- A save or delete through `saved` or `removed` that fails with no error messages raises `HubKernel::Refused` saying which kind of record could not be saved or deleted, such as `Consumable could not be saved`, in place of an empty message.
+
 ## [0.23.0] - 2026-10-14
 
 ### Added
