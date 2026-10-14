@@ -109,6 +109,20 @@ module HubKernel
       assert_equal [ [ "Roof", true ], nil ], quotes.map { |quote| Quote.find(quote.id).wanted_job&.then { |job| [ job.name, job.readonly? ] } }
     end
 
+    test "no option passed to the declaration makes a linked record writable" do
+      model = self.class.const_set(:Order, Class.new(ActiveRecord::Base) { self.table_name = "port_quotes" })
+      writing = { autosave: true, dependent: :destroy, touch: true, counter_cache: true }
+
+      refusals = writing.map do |option, value|
+        model.belongs_to_port(:job, port: Sales, record: :job_record, option => value)
+        nil
+      rescue ArgumentError => error
+        error.message
+      end
+
+      assert_equal writing.keys.map { |option| "job is a read-only record port link, so it does not take #{option}" }, refusals
+    end
+
     private
 
     def refusal
