@@ -6,9 +6,9 @@ module HubKernel
     class Shelf
       include ActiveModel::Model
 
-      attr_accessor :id, :name
+      attr_accessor :id, :name, :aisle
 
-      validates :name, presence: true
+      validates :name, :aisle, presence: true
 
       def save = valid?
 
@@ -24,11 +24,15 @@ module HubKernel
     end
 
     test "saving a record gives back its id" do
-      assert_equal 7, Shop.stock(Shelf.new(id: 7, name: "Soap"))
+      assert_equal 7, Shop.stock(Shelf.new(id: 7, name: "Soap", aisle: 3))
     end
 
     test "deleting a record gives back its id" do
-      assert_equal 7, Shop.clear(Shelf.new(id: 7, name: "Soap"))
+      assert_equal 7, Shop.clear(Shelf.new(id: 7, name: "Soap", aisle: 3))
+    end
+
+    test "a save that fails is refused with the record's errors as one sentence" do
+      assert_raises(HubKernel::Refused, match: /\AName can't be blank and Aisle can't be blank\z/) { Shop.stock(Shelf.new(id: 7)) }
     end
   end
 end
