@@ -171,6 +171,14 @@ module HubKernel
       assert_equal Quote, team.reflect_on_association(:quotes)&.klass
     end
 
+    test "saving or destroying a record listed through the has-many link raises a read-only error" do
+      job = Job.create!(name: "Roof")
+      Quote.create!(job_id: job.id)
+      listed = [ Job.find(job.id).quotes.first, Job.find(job.id).quotes.to_a.first, Job.preload(:quotes).find(job.id).quotes.first, Job.eager_load(:quotes).find(job.id).quotes.first ]
+
+      assert_equal [ ActiveRecord::ReadOnlyRecord ] * 8, listed.flat_map { |record| [ refusal { record.update!(wanted: "Deck") }, refusal { record.destroy } ] }
+    end
+
     private
 
     def refusal
