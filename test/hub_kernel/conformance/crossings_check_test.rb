@@ -124,6 +124,10 @@ module HubKernel
         end
       end
 
+      test "the crossing check passes a hub whose model links to another hub's record through a record port" do
+        assert_nil crossing_check_failure(Rails.root.to_s, files: "hubs/{kitchen,cookbook}/**/*.rb", owners: {})
+      end
+
       private
 
       def write(root, path, source)

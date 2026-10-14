@@ -126,6 +126,47 @@ end
 `Fulfillment.job_record` then answers `Job`. A record port is on the hub's
 `port_names`, so the start check, the hub check and kept ports all read it.
 
+### Links through a record port
+A hub's model links to a record another hub owns with `belongs_to_port`, naming its own
+hub and one of that hub's record ports instead of the other model's class:
+
+```ruby
+module Sales
+  class Quote < ApplicationRecord
+    belongs_to_port :job, port: Sales, record: :job_record
+  end
+end
+```
+
+hub_kernel defines an ordinary `belongs_to :job` whose class is the model the app filled
+the port with. `quote.job` reads the job, and `includes`, `preload`, `joins`, `where` and
+`order` work on the link as on any `belongs_to`. Every other `belongs_to` option, such as
+`foreign_key:` or `optional:`, and a scope passed before the options, reach the
+association unchanged. The class name comes from the port, so one passed is not used.
+
+A link is always read-only, and no option makes it writable:
+
+- A record read through the link, loaded or preloaded, raises
+  `ActiveRecord::ReadOnlyRecord` when it is saved or destroyed.
+- `build_job`, `create_job` and `create_job!` raise `ActiveRecord::ReadOnlyRecord`, and so
+  does assigning an unsaved record to `job`.
+- The records a scope loads are read-only too.
+- `autosave`, `dependent`, `touch` and `counter_cache` each write to the linked record, so
+  passing any of them raises an `ArgumentError` naming it.
+
+The model still sets which record it links to, by assigning a saved record or its id, and
+saves itself. A change to the linked record goes through the hub that owns it.
+
+The link is defined as soon as both the model has loaded and the port is filled, in
+whichever order those happen. A model that loads after its port is filled has the link
+when it loads. A model that loads first waits on its hub, and filling the port defines the
+link. A boot with eager loading on defines it the same way. After a code reload in
+development, the reloaded model has the link again, and it points at the reloaded model
+the app fills the port with.
+
+The model names only its own hub, so the crossing check passes it. The app's
+`to_prepare` block that fills the port is the one place both models are named.
+
 ### The start check
 Every hub that declares a port or exposes a method is on `HubKernel::Hubs.list`. Call
 `HubKernel::Hubs.check!` after the app fills its ports, and the app refuses to start
