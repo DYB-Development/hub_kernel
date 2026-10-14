@@ -1,6 +1,7 @@
 module HubKernel
   module PortAssociations
     WRITING_OPTIONS = %i[autosave dependent touch counter_cache].freeze
+    LIST_WRITING_OPTIONS = %i[autosave dependent counter_cache].freeze
     LIST_WRITING_METHODS = %i[<< push append concat build new create create! delete destroy delete_all destroy_all clear replace].freeze
 
     def belongs_to_port(name, scope = nil, port:, record:, **options)
@@ -12,6 +13,7 @@ module HubKernel
     end
 
     def has_many_port(name, scope = nil, port:, record:, **options)
+      refuse_writing_options(name, options, LIST_WRITING_OPTIONS)
       refusal = "#{self.name}'s #{name} link is read-only, so it cannot add, remove, build or create a record"
       port.link_record(record, [ self.name, name ]) do |model|
         has_many name, read_only(scope, refusing_list(refusal)), **options, class_name: model.name
@@ -21,8 +23,8 @@ module HubKernel
 
     private
 
-    def refuse_writing_options(name, options)
-      writing = options.keys & WRITING_OPTIONS
+    def refuse_writing_options(name, options, writers = WRITING_OPTIONS)
+      writing = options.keys & writers
       raise ArgumentError, "#{name} is a read-only record port link, so it does not take #{writing.to_sentence}" if writing.any?
     end
 

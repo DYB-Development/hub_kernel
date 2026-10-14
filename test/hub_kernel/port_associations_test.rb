@@ -191,6 +191,20 @@ module HubKernel
       assert_equal [ ActiveRecord::ReadOnlyRecord ] * attempts.size, attempts.map { |attempt| refusal(&attempt) }
     end
 
+    test "no option passed to the has-many declaration makes a listed record writable" do
+      model = self.class.const_set(:Shop, Class.new(ActiveRecord::Base) { self.table_name = "port_jobs" })
+      writing = [ [ :autosave, true ], [ :counter_cache, true ] ] + %i[destroy delete_all nullify destroy_async].map { |value| [ :dependent, value ] }
+
+      refusals = writing.map do |option, value|
+        model.has_many_port(:quotes, port: Sales, record: :quote_record, foreign_key: :job_id, option => value)
+        nil
+      rescue ArgumentError => error
+        error.message
+      end
+
+      assert_equal writing.map { |option, _| "quotes is a read-only record port link, so it does not take #{option}" }, refusals
+    end
+
     private
 
     def refusal
