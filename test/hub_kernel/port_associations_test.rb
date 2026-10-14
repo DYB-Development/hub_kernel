@@ -18,6 +18,7 @@ module HubKernel
       self.table_name = "port_quotes"
 
       belongs_to_port :job, port: Sales, record: :job_record
+      belongs_to_port :first_job, port: Sales, record: :job_record, foreign_key: :job_id, optional: true, inverse_of: false
     end
 
     setup do
@@ -39,6 +40,12 @@ module HubKernel
       quotes = Quote.includes(:job).joins(:job).where(job: { name: %w[Roof Deck] }).order(job: { name: :asc })
 
       assert_equal [ deck, roof ], quotes.map(&:job)
+    end
+
+    test "every option a belongs_to takes other than its class name reaches the association" do
+      options = Quote.reflect_on_association(:first_job).options
+
+      assert_equal({ foreign_key: :job_id, optional: true, inverse_of: false }, options.slice(:foreign_key, :optional, :inverse_of))
     end
   end
 end
