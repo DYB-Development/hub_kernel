@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.22.0] - 2026-10-14
+
 ### Added
 - Record saving: a hub that extends `HubKernel::Records` gets two private methods, `saved` and `removed`, that save or delete a record and return its id, or raise `HubKernel::Refused` with the record's error messages joined into one sentence.
 
