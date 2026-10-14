@@ -16,10 +16,23 @@ module HubKernel
       port :job_chooser, as: :job_choices
     end
 
+    module Fulfillment
+      extend HubKernel::Ports
+
+      record_port :job_record
+    end
+
+    class Job < ActiveRecord::Base
+    end
+
+    class Order < ActiveRecord::Base
+    end
+
     teardown do
       Sales.person_chooser = nil
       Sales.payment_lister = nil
       Finance.job_chooser = nil
+      Fulfillment.job_record = nil
     end
 
     test "every port of each hub a test names is filled after the test as it was before it" do
@@ -51,6 +64,14 @@ module HubKernel
       end
 
       assert_equal [ [ replacement, [ "Sales' payment lister is not wired" ] ], [ person_chooser, [] ] ], [ during, [ Sales.person_chooser, Sales.unwired_ports ] ]
+    end
+
+    test "a record port holds the model it held before the test after the test" do
+      Fulfillment.job_record = Job
+
+      run_test_keeping(Fulfillment) { Fulfillment.job_record = Order }
+
+      assert_equal Job, Fulfillment.job_record
     end
 
     private
