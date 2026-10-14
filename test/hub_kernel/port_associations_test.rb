@@ -218,6 +218,19 @@ module HubKernel
       assert_equal [ [ false, true ], [ false, true ] ], deleted
     end
 
+    test "writing the listed records all at once through the has-many link raises a read-only error" do
+      job = Job.create!(name: "Roof")
+      Quote.create!(job_id: job.id)
+      attempts = [
+        -> { job.quotes.update_all(wanted: "Deck") }, -> { job.quotes.update_counters(job_id: 1) },
+        -> { job.quotes.delete_by(wanted: nil) }, -> { job.quotes.destroy_by(wanted: nil) },
+        -> { job.quotes.insert({ wanted: "Deck" }) }, -> { job.quotes.insert!({ wanted: "Deck" }) }, -> { job.quotes.insert_all([ { wanted: "Deck" } ]) },
+        -> { job.quotes.insert_all!([ { wanted: "Deck" } ]) }, -> { job.quotes.upsert({ wanted: "Deck" }) }, -> { job.quotes.upsert_all([ { wanted: "Deck" } ]) }
+      ]
+
+      assert_equal [ ActiveRecord::ReadOnlyRecord ] * attempts.size, attempts.map { |attempt| refusal(&attempt) }
+    end
+
     private
 
     def deleted?(owner)
