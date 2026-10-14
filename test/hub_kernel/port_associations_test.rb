@@ -31,5 +31,14 @@ module HubKernel
 
       assert_equal job, Quote.create!(job_id: job.id).job
     end
+
+    test "linked records can be preloaded, joined, filtered and ordered on" do
+      roof, deck, shed = %w[Roof Deck Shed].map { |name| Job.create!(name: name) }
+      [ roof, deck, shed ].each { |job| Quote.create!(job_id: job.id) }
+
+      quotes = Quote.includes(:job).joins(:job).where(job: { name: %w[Roof Deck] }).order(job: { name: :asc })
+
+      assert_equal [ deck, roof ], quotes.map(&:job)
+    end
   end
 end
