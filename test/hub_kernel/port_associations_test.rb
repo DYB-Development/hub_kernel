@@ -19,6 +19,7 @@ module HubKernel
       self.table_name = "port_jobs"
 
       has_many_port :quotes, port: Sales, record: :quote_record
+      has_many_port :priced_quotes, port: Sales, record: :quote_record, foreign_key: :job_id, inverse_of: false, validate: false, strict_loading: true
     end
 
     Sales.job_record = Job
@@ -142,6 +143,12 @@ module HubKernel
       jobs = Job.includes(:quotes).joins(:quotes).where(quotes: { wanted: %w[Roof Deck] }).order(quotes: { wanted: :asc })
 
       assert_equal [ [ "Deck" ], [ "Roof" ] ], jobs.map { |job| job.quotes.map(&:wanted) }
+    end
+
+    test "every option a has_many takes other than its class name reaches the has-many link" do
+      options = Job.reflect_on_association(:priced_quotes).options
+
+      assert_equal({ foreign_key: :job_id, inverse_of: false, validate: false, strict_loading: true }, options.slice(:foreign_key, :inverse_of, :validate, :strict_loading))
     end
 
     private
