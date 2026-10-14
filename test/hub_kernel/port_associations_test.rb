@@ -179,6 +179,18 @@ module HubKernel
       assert_equal [ ActiveRecord::ReadOnlyRecord ] * 8, listed.flat_map { |record| [ refusal { record.update!(wanted: "Deck") }, refusal { record.destroy } ] }
     end
 
+    test "adding to, removing from, building or creating through the has-many link raises a read-only error" do
+      job, deck = %w[Roof Deck].map { |name| Job.create!(name: name) }
+      listed, other = [ job, deck ].map { |owner| Quote.create!(job_id: owner.id) }
+      adding = %i[<< push append concat].map { |method| -> { job.quotes.public_send(method, other) } }
+      building = %i[build new create create!].map { |method| -> { job.quotes.public_send(method, wanted: "Roof") } }
+      removing = %i[delete destroy].map { |method| -> { job.quotes.public_send(method, listed) } } + %i[delete_all destroy_all clear].map { |method| -> { job.quotes.public_send(method) } }
+      replacing = [ -> { job.quotes.replace([ other ]) }, -> { job.update(quotes: [ other ]) }, -> { job.update(quote_ids: [ other.id ]) }, -> { job.quotes.where(wanted: "Roof").create!(wanted: "Roof") } ]
+      attempts = adding + building + removing + replacing
+
+      assert_equal [ ActiveRecord::ReadOnlyRecord ] * attempts.size, attempts.map { |attempt| refusal(&attempt) }
+    end
+
     private
 
     def refusal
