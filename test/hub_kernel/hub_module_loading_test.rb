@@ -21,4 +21,11 @@ class HubKernel::HubModuleLoadingTest < ActiveSupport::TestCase
 
     assert_equal "loaded", output.lines.last&.chomp
   end
+
+  test "a model in a hub folder has its record port link when the app boots with eager loading on" do
+    read = "puts [ Rails.application.config.eager_load, Kitchen::Dish.reflect_on_association(:recipe)&.klass ].join(' ')"
+    output = Dir.chdir(Rails.root) { `CI=1 bin/rails runner -e test "#{read}" 2>&1` }
+
+    assert_equal "true Cookbook::Recipe", output.lines.last&.chomp
+  end
 end
