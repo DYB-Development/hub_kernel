@@ -28,4 +28,11 @@ class HubKernel::HubModuleLoadingTest < ActiveSupport::TestCase
 
     assert_equal "true Cookbook::Recipe", output.lines.last&.chomp
   end
+
+  test "a model in a hub folder has its record port link after a code reload in development, linked to the reloaded model" do
+    reload = "before = Kitchen::Dish.reflect_on_association(:recipe).klass; Rails.application.reloader.check = -> { true }; Rails.application.reloader.reload!; after = Kitchen::Dish.reflect_on_association(:recipe)&.klass; puts [ after.equal?(Cookbook::Recipe), after.equal?(before) ].join(' ')"
+    output = Dir.chdir(Rails.root) { `bin/rails runner -e development "#{reload}" 2>&1` }
+
+    assert_equal "true false", output.lines.last&.chomp
+  end
 end
