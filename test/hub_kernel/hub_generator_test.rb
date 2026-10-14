@@ -49,6 +49,21 @@ module HubKernel
       Object.send(:remove_const, :GeneratedLedger) if Object.const_defined?(:GeneratedLedger)
     end
 
+    test "a generated hub test that includes kept ports runs with no other setup" do
+      run_generator [ "GeneratedTill", "cash_counter:count_cash" ]
+      load File.join(destination_root, "hubs/generated_till/app/models/generated_till.rb")
+      GeneratedTill.cash_counter = -> { 0 }
+      generated_test = File.read(File.join(destination_root, "test/hubs/generated_till/generated_till_test.rb"))
+      eval generated_test.sub("  include HubKernel::Conformance::Hub\n", "  include HubKernel::Conformance::Hub\n  include HubKernel::KeptPorts\n").prepend("require \"hub_kernel/kept_ports\"\n")
+      Minitest::Runnable.runnables.delete(GeneratedTillTest)
+
+      assert_equal [], GeneratedTillTest.runnable_methods.flat_map { |name| GeneratedTillTest.new(name).run.failures.map(&:message) }
+    ensure
+      HubKernel::Hubs.registered.reject! { |hub| hub.name == "GeneratedTill" }
+      Object.send(:remove_const, :GeneratedTill) if Object.const_defined?(:GeneratedTill)
+      Object.send(:remove_const, :GeneratedTillTest) if Object.const_defined?(:GeneratedTillTest)
+    end
+
     test "a hub generated inside a gem adds hub_kernel to the gem's gemspec" do
       write_gemspec
       run_generator [ "Billing" ]

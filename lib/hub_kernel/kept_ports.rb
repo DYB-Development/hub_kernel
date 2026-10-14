@@ -17,6 +17,8 @@ module HubKernel
 
     private
 
+    def hubs_with_kept_ports = [ the_hub ]
+
     def fillings_of(hub) = hub.port_names.to_h { |port| [ port, hub.instance_variable_get(:"@#{port}") ] }
   end
 end
