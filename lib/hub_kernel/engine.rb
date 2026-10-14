@@ -18,7 +18,7 @@ module HubKernel
 
     config.after_initialize do
       Dir[Rails.root.join(HubFolders.code_glob, "**/*.rb")].each do |file|
-        next unless File.read(file).match?(/extend HubKernel::Ports\b/)
+        next unless File.read(file).match?(/extend HubKernel::(Ports|Exposes)\b/)
 
         HubFolders.class_of(Pathname(file).relative_path_from(Rails.root).to_s).constantize
       end
