@@ -6,6 +6,9 @@
 - At boot and after each code reload, hub_kernel loads every hub module in the host's hub folders, so the start check checks it and hub_kernel-interface serves it even when nothing else names it. The loading runs before the host's own `to_prepare` code fills ports.
 - `HubKernel::HubFolders.hub_modules(root)` names the class of every hub module in the hub folders under `root`, and the crossing check finds hub modules by the same rule.
 
+### Changed
+- A save or delete through `saved` or `removed` that fails with no error messages raises `HubKernel::Refused` saying which kind of record could not be saved or deleted, such as `Consumable could not be saved`, in place of an empty message.
+
 ## [0.23.0] - 2026-10-14
 
 ### Added

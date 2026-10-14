@@ -15,6 +15,16 @@ module HubKernel
       def destroy = valid?
     end
 
+    class Crate
+      include ActiveModel::Model
+
+      attr_accessor :id
+
+      def save = false
+
+      def destroy = false
+    end
+
     module Shop
       extend HubKernel::Records
 
@@ -37,6 +47,14 @@ module HubKernel
 
     test "a delete that fails is refused with the record's errors as one sentence" do
       assert_raises(HubKernel::Refused, match: /\AName can't be blank and Aisle can't be blank\z/) { Shop.clear(Shelf.new(id: 7)) }
+    end
+
+    test "a save that fails with no errors is refused naming the kind of record" do
+      assert_raises(HubKernel::Refused, match: /\ACrate could not be saved\z/) { Shop.stock(Crate.new(id: 7)) }
+    end
+
+    test "a delete that is stopped with no errors is refused naming the kind of record" do
+      assert_raises(HubKernel::Refused, match: /\ACrate could not be deleted\z/) { Shop.clear(Crate.new(id: 7)) }
     end
 
     test "a hub's callers cannot save or delete through it" do
