@@ -14,4 +14,11 @@ class HubKernel::HubModuleLoadingTest < ActiveSupport::TestCase
   test "every hub module in a hub folder is loaded before the host's own boot code fills ports" do
     assert_equal %w[Larder Pantry], (HUBS_SEEN_BY_HOST & %w[Larder Pantry]).sort
   end
+
+  test "every hub module in a hub folder is loaded again after a code reload in development" do
+    reload = "Rails.application.reloader.check = -> { true }; Rails.application.reloader.reload!; puts Object.autoload?(:Pantry) ? 'unloaded' : 'loaded'"
+    output = Dir.chdir(Rails.root) { `bin/rails runner -e development "#{reload}" 2>&1` }
+
+    assert_equal "loaded", output.lines.last&.chomp
+  end
 end
