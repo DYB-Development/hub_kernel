@@ -11,8 +11,9 @@ module HubKernel
 
     def read_only(scope)
       return -> { readonly } unless scope
+      return -> { instance_exec(&scope).readonly } if scope.arity.zero?
 
-      -> { instance_exec(&scope).readonly }
+      ->(owner) { instance_exec(owner, &scope).readonly }
     end
 
     def refuse_creating_through(name)

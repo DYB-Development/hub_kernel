@@ -26,12 +26,13 @@ module HubKernel
       belongs_to_port :job, port: Sales, record: :job_record
       belongs_to_port :first_job, port: Sales, record: :job_record, foreign_key: :job_id, optional: true, inverse_of: false
       belongs_to_port :roofing_job, -> { where(name: "Roof") }, port: Sales, record: :job_record, foreign_key: :job_id, optional: true
+      belongs_to_port :wanted_job, ->(quote) { where(name: quote.wanted) }, port: Sales, record: :job_record, foreign_key: :job_id, optional: true
     end
 
     setup do
       connection = ActiveRecord::Base.connection
       connection.create_table(:port_jobs, force: true) { |table| table.string :name }
-      connection.create_table(:port_quotes, force: true) { |table| table.references :job }
+      connection.create_table(:port_quotes, force: true) { |table| table.references :job; table.string :wanted }
     end
 
     teardown { Pipelines.job_record = nil }
@@ -99,6 +100,13 @@ module HubKernel
       quotes = [ roof, deck ].map { |job| Quote.create!(job: job) }
 
       assert_equal [ [ "Roof", true ], nil ], quotes.map { |quote| Quote.find(quote.id).roofing_job&.then { |job| [ job.name, job.readonly? ] } }
+    end
+
+    test "a scope the declaration passes that reads the model's own record is applied and its records are still read-only" do
+      roof, deck = %w[Roof Deck].map { |name| Job.create!(name: name) }
+      quotes = [ roof, deck ].map { |job| Quote.create!(job: job, wanted: "Roof") }
+
+      assert_equal [ [ "Roof", true ], nil ], quotes.map { |quote| Quote.find(quote.id).wanted_job&.then { |job| [ job.name, job.readonly? ] } }
     end
 
     private
