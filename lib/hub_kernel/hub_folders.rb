@@ -21,5 +21,10 @@ module HubKernel
     def self.view_paths(root) = Dir[root.join("#{code_glob}/views")]
 
     def self.helper_paths(root) = Dir[root.join("#{code_glob}/helpers")]
+
+    def self.hub_of_controller(root, page)
+      controller = Dir[root.join(code_glob, "controllers", "#{page}_controller.rb").to_s].first
+      hub_of(Pathname(controller).relative_path_from(root).to_s)
+    end
   end
 end

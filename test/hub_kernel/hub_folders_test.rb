@@ -28,4 +28,20 @@ class HubKernel::HubFoldersTest < ActiveSupport::TestCase
   test "files under a hub folder's lib folder are not loaded as code" do
     assert_not Object.const_defined?(:BillingEvents)
   end
+
+  test "the hub folder holding a page's controller is named by its controller path" do
+    Dir.mktmpdir do |root|
+      write_controller(root, "billing", "billing/invoices")
+
+      assert_equal :billing, HubKernel::HubFolders.hub_of_controller(Pathname(root), "billing/invoices")
+    end
+  end
+
+  private
+
+  def write_controller(root, hub, page)
+    path = Pathname(root).join("hubs", hub, "app", "controllers", "#{page}_controller.rb")
+    FileUtils.mkdir_p(path.dirname)
+    FileUtils.touch(path)
+  end
 end
