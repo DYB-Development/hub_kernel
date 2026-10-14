@@ -7,6 +7,7 @@ module HubKernel
 
     PATH = %r{\A#{ROOT}/([^/]+)/}
     CODE_PATH = %r{\A#{ROOT}/[^/]+/#{CODE}/[^/]+/}
+    HUB_MODULE = /extend HubKernel::(Ports|Exposes)\b/
 
     def self.folder(hub) = "#{ROOT}/#{hub}"
 
@@ -23,6 +24,12 @@ module HubKernel
     def self.view_paths(root) = Dir[root.join("#{code_glob}/views")]
 
     def self.helper_paths(root) = Dir[root.join("#{code_glob}/helpers")]
+
+    def self.hub_module?(path, source) = source.match?(HUB_MODULE) && path.match?(CODE_PATH)
+
+    def self.hub_modules(root)
+      Dir.glob("#{code_glob}/**/*.rb", base: root).select { |path| hub_module?(path, root.join(path).read) }.map { |path| class_of(path) }
+    end
 
     def self.hub_of_controller(root, page)
       controllers = Dir[root.join(code_glob, "controllers", "#{page}_controller.rb").to_s].sort

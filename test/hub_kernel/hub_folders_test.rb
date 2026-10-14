@@ -57,7 +57,23 @@ class HubKernel::HubFoldersTest < ActiveSupport::TestCase
     end
   end
 
+  test "the hub modules of a host's hub folders are the classes that extend Ports or Exposes" do
+    Dir.mktmpdir do |root|
+      write_file(root, "hubs/supplies/app/models/supplies.rb", "module Supplies\n  extend HubKernel::Ports\nend\n")
+      write_file(root, "hubs/supplies/app/models/supplies/purchase.rb", "class Supplies::Purchase\nend\n")
+      write_file(root, "hubs/finance/app/models/finance.rb", "module Finance\n  extend HubKernel::Exposes\nend\n")
+
+      assert_equal %w[Finance Supplies], HubKernel::HubFolders.hub_modules(Pathname(root)).sort
+    end
+  end
+
   private
+
+  def write_file(root, path, source)
+    file = Pathname(root).join(path)
+    FileUtils.mkdir_p(file.dirname)
+    file.write(source)
+  end
 
   def write_controller(root, hub, page)
     path = Pathname(root).join("hubs", hub, "app", "controllers", "#{page}_controller.rb")
