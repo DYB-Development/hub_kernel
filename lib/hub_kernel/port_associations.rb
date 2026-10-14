@@ -10,6 +10,12 @@ module HubKernel
       end
     end
 
+    def has_many_port(name, scope = nil, port:, record:, **options)
+      port.link_record(record, [ self.name, name ]) do |model|
+        has_many name, scope, **options, class_name: model.name
+      end
+    end
+
     private
 
     def refuse_writing_options(name, options)

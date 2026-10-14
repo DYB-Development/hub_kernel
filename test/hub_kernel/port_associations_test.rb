@@ -6,6 +6,7 @@ module HubKernel
       extend HubKernel::Ports
 
       record_port :job_record
+      record_port :quote_record
     end
 
     module Pipelines
@@ -16,6 +17,8 @@ module HubKernel
 
     class Job < ActiveRecord::Base
       self.table_name = "port_jobs"
+
+      has_many_port :quotes, port: Sales, record: :quote_record
     end
 
     Sales.job_record = Job
@@ -28,6 +31,8 @@ module HubKernel
       belongs_to_port :roofing_job, -> { where(name: "Roof") }, port: Sales, record: :job_record, foreign_key: :job_id, optional: true
       belongs_to_port :wanted_job, ->(quote) { where(name: quote.wanted) }, port: Sales, record: :job_record, foreign_key: :job_id, optional: true
     end
+
+    Sales.quote_record = Quote
 
     setup do
       connection = ActiveRecord::Base.connection
@@ -121,6 +126,13 @@ module HubKernel
       end
 
       assert_equal writing.keys.map { |option| "job is a read-only record port link, so it does not take #{option}" }, refusals
+    end
+
+    test "a model lists the records that point back at it through a has-many link the way it lists any has_many" do
+      job = Job.create!(name: "Roof")
+      quotes = Array.new(2) { Quote.create!(job_id: job.id) }
+
+      assert_equal quotes, job.quotes.sort_by(&:id)
     end
 
     private
