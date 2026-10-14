@@ -3,7 +3,6 @@ require "active_support/core_ext/string/inflections"
 
 module HubKernel
   class Crossings
-    HUB_MODULE = /extend HubKernel::(Ports|Exposes)\b/
     def initialize(owners: {}, shared: [], host_layer: nil, interfaces: {}, namespaces: {}, folder_files: [])
       @owners = owners
       @folder_classes = {}
@@ -27,7 +26,7 @@ module HubKernel
 
     def read_hub_modules(sources)
       sources.each do |path, source|
-        next unless source.match?(HUB_MODULE) && path.match?(HubFolders::CODE_PATH)
+        next unless HubFolders.hub_module?(path, source)
 
         @folder_interfaces[HubFolders.class_of(path)] = HubFolders.hub_of(path)
       end

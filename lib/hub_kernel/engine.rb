@@ -15,5 +15,7 @@ module HubKernel
       views = HubFolders.view_paths(app.root)
       ActiveSupport.on_load(:action_controller) { append_view_path(views) }
     end
+
+    config.to_prepare { HubFolders.hub_modules(Rails.root).each(&:constantize) }
   end
 end
