@@ -26,6 +26,12 @@ module HubKernel
         assert_equal "Kitchen::Dish#oven_id has no association using it", unlinked_ids_failure(except: [ "Kitchen::Dish#chef_id" ])
       end
 
+      test "the unlinked id check fails when it finds no model with a table in any hub folder" do
+        [ Kitchen::Dish, Cookbook::Recipe ].each { |model| ActiveRecord::Base.connection.drop_table(model.table_name) }
+
+        assert_equal "The unlinked id check found no model with a table in any hub folder", unlinked_ids_failure
+      end
+
       private
 
       def unlinked_ids_failure(**options) = unlinked_ids_run(**options).failures.first&.message
