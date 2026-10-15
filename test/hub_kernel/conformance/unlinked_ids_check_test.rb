@@ -22,6 +22,10 @@ module HubKernel
         assert_equal "Kitchen::Dish#chef_id has no association using it\nKitchen::Dish#oven_id has no association using it", unlinked_ids_failure
       end
 
+      test "the unlinked id check leaves out each column the host excepts" do
+        assert_equal "Kitchen::Dish#oven_id has no association using it", unlinked_ids_failure(except: [ "Kitchen::Dish#chef_id" ])
+      end
+
       private
 
       def unlinked_ids_failure(**options) = unlinked_ids_run(**options).failures.first&.message
