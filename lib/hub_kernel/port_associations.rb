@@ -7,6 +7,7 @@ module HubKernel
 
     def belongs_to_port(name, scope = nil, port:, record:, **options)
       refuse_writing_options(name, options)
+      refuse_non_hub(name, port)
       port.link_record(record, [ self.name, name ]) do |model|
         belongs_to name, read_only(scope), **options, class_name: model.name
         refuse_creating_through(name)
@@ -27,6 +28,10 @@ module HubKernel
     def refuse_writing_options(name, options, writers = WRITING_OPTIONS)
       writing = options.keys & writers
       raise ArgumentError, "#{name} is a read-only record port link, so it does not take #{writing.to_sentence}" if writing.any?
+    end
+
+    def refuse_non_hub(name, port)
+      raise ArgumentError, "#{self.name} links #{name} through #{port}, which is not a hub module" unless port.is_a?(HubKernel::Ports)
     end
 
     def read_only(scope, *extensions)

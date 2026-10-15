@@ -248,6 +248,14 @@ module HubKernel
       assert_equal "#{model.name} links job through #{Sales.name} job_namer, which is a call port, not a record port", error.message
     end
 
+    test "a link naming a hub that is not a hub module raises when the model loads naming the model" do
+      model = self.class.const_set(:Unhubbed, Class.new(ActiveRecord::Base) { self.table_name = "port_quotes" })
+
+      error = assert_raises(ArgumentError) { model.belongs_to_port :job, port: Comparable, record: :job_record }
+
+      assert_equal "#{model.name} links job through Comparable, which is not a hub module", error.message
+    end
+
     private
 
     def deleted?(owner)
