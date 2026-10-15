@@ -7,6 +7,7 @@ module HubKernel
 
       record_port :job_record
       record_port :quote_record
+      port :job_namer, as: :job_name
     end
 
     module Pipelines
@@ -229,6 +230,38 @@ module HubKernel
       ]
 
       assert_equal [ ActiveRecord::ReadOnlyRecord ] * attempts.size, attempts.map { |attempt| refusal(&attempt) }
+    end
+
+    test "a link naming a port its hub does not declare raises when the model loads naming the model, the hub and the port" do
+      model = self.class.const_set(:Misspelled, Class.new(ActiveRecord::Base) { self.table_name = "port_quotes" })
+
+      error = assert_raises(ArgumentError) { model.belongs_to_port :job, port: Sales, record: :jobs_record }
+
+      assert_equal "#{model.name} links job through #{Sales.name} jobs_record, which #{Sales.name} does not declare", error.message
+    end
+
+    test "a link naming a call port raises when the model loads naming the model, the hub and the port" do
+      model = self.class.const_set(:Called, Class.new(ActiveRecord::Base) { self.table_name = "port_quotes" })
+
+      error = assert_raises(ArgumentError) { model.belongs_to_port :job, port: Sales, record: :job_namer }
+
+      assert_equal "#{model.name} links job through #{Sales.name} job_namer, which is a call port, not a record port", error.message
+    end
+
+    test "a link naming a hub that is not a hub module raises when the model loads naming the model" do
+      model = self.class.const_set(:Unhubbed, Class.new(ActiveRecord::Base) { self.table_name = "port_quotes" })
+
+      error = assert_raises(ArgumentError) { model.belongs_to_port :job, port: Comparable, record: :job_record }
+
+      assert_equal "#{model.name} links job through Comparable, which is not a hub module", error.message
+    end
+
+    test "a has-many link naming a hub that is not a hub module raises when the model loads naming the model" do
+      model = self.class.const_set(:UnhubbedList, Class.new(ActiveRecord::Base) { self.table_name = "port_jobs" })
+
+      error = assert_raises(ArgumentError) { model.has_many_port :quotes, port: Comparable, record: :quote_record }
+
+      assert_equal "#{model.name} links quotes through Comparable, which is not a hub module", error.message
     end
 
     private
