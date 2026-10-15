@@ -400,6 +400,30 @@ end
   `HubKernel::Ports` or `HubKernel::Exposes`, such as "hubs/suplies holds no hub module",
   so a misspelled or half-made hub folder does not pass unnoticed.
 
+### The unlinked id check
+A host's test can check that every link a hub's model makes is an association, so a new
+link to another hub's record cannot be added as a bare id column:
+
+```ruby
+require "hub_kernel/conformance/unlinked_ids"
+
+class UnlinkedIdsTest < ActiveSupport::TestCase
+  include HubKernel::Conformance::UnlinkedIds
+
+  unlinked_ids except: [ "Billing::Invoice#legacy_id" ]
+end
+```
+
+- The test reads every Active Record model under each hub folder's `app/models`, and
+  fails naming each column ending in `_id` that no `belongs_to` on that model uses as its
+  foreign key, such as "Kitchen::Dish#oven_id has no association using it".
+- A `belongs_to_port` link counts, and so does an ordinary `belongs_to` inside a hub.
+- `except` lists columns the test does not report, each written as the model and the
+  column joined by `#`. The `unlinked_ids` line may be left out when there are none.
+- Abstract classes and models whose table does not exist are skipped.
+- The test fails with "The unlinked id check found no model with a table in any hub
+  folder" when it finds none, so a wrong setup does not pass unnoticed.
+
 ## Installation
 Add this line to your application's Gemfile:
 

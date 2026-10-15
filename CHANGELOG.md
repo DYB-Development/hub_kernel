@@ -4,6 +4,7 @@
 
 ### Added
 - A `belongs_to_port` or `has_many_port` link that names a port its hub does not declare, or a call port, raises an `ArgumentError` when the model loads, naming the model, the hub and the port, in place of a `NoMethodError` or a link that is never defined. A link whose `port:` is not a hub module raises an `ArgumentError` naming the model.
+- The unlinked id check: a host test that includes `HubKernel::Conformance::UnlinkedIds` fails naming each column ending in `_id` of a model in a hub folder that no `belongs_to` on that model uses as its foreign key, leaves out the columns listed with `unlinked_ids except: [ "Model#column" ]`, and fails when it finds no model with a table in any hub folder.
 
 ## [0.26.0] - 2026-10-14
 
