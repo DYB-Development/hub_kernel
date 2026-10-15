@@ -231,6 +231,14 @@ module HubKernel
       assert_equal [ ActiveRecord::ReadOnlyRecord ] * attempts.size, attempts.map { |attempt| refusal(&attempt) }
     end
 
+    test "a link naming a port its hub does not declare raises when the model loads naming the model, the hub and the port" do
+      model = self.class.const_set(:Misspelled, Class.new(ActiveRecord::Base) { self.table_name = "port_quotes" })
+
+      error = assert_raises(ArgumentError) { model.belongs_to_port :job, port: Sales, record: :jobs_record }
+
+      assert_equal "#{model.name} links job through #{Sales.name} jobs_record, which #{Sales.name} does not declare", error.message
+    end
+
     private
 
     def deleted?(owner)
