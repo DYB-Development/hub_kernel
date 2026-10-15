@@ -23,6 +23,7 @@ module HubKernel
 
     def link_record(name, model_and_link, &link)
       refuse_link(name, model_and_link, "#{self.name} does not declare") unless declared_ports.include?(name)
+      refuse_link(name, model_and_link, "is a call port, not a record port") unless record_ports.include?(name)
       links_to(name)[model_and_link] = link
       filling = public_send(name)
       link.call(filling) if active_record_model?(filling)
