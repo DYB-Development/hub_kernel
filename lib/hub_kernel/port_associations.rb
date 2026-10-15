@@ -16,6 +16,7 @@ module HubKernel
 
     def has_many_port(name, scope = nil, port:, record:, **options)
       refuse_writing_options(name, options.reject { |option, value| option == :dependent && RESTRICTING.include?(value) }, LIST_WRITING_OPTIONS)
+      refuse_non_hub(name, port)
       refusal = "#{self.name}'s #{name} link is read-only, so no record can be written through it"
       port.link_record(record, [ self.name, name ]) do |model|
         has_many name, read_only(scope, refusing_list(refusal)), **options, class_name: model.name

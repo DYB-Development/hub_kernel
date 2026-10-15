@@ -256,6 +256,14 @@ module HubKernel
       assert_equal "#{model.name} links job through Comparable, which is not a hub module", error.message
     end
 
+    test "a has-many link naming a hub that is not a hub module raises when the model loads naming the model" do
+      model = self.class.const_set(:UnhubbedList, Class.new(ActiveRecord::Base) { self.table_name = "port_jobs" })
+
+      error = assert_raises(ArgumentError) { model.has_many_port :quotes, port: Comparable, record: :quote_record }
+
+      assert_equal "#{model.name} links quotes through Comparable, which is not a hub module", error.message
+    end
+
     private
 
     def deleted?(owner)
