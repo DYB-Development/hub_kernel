@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Added
+- A `belongs_to_port` or `has_many_port` link that names a port its hub does not declare, or a call port, raises an `ArgumentError` when the model loads, naming the model, the hub and the port, in place of a `NoMethodError` or a link that is never defined. A link whose `port:` is not a hub module raises an `ArgumentError` naming the model.
+
 ## [0.26.0] - 2026-10-14
 
 ### Added

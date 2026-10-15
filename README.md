@@ -164,6 +164,10 @@ link. A boot with eager loading on defines it the same way. After a code reload 
 development, the reloaded model has the link again, and it points at the reloaded model
 the app fills the port with.
 
+A link that names a port its hub does not declare, or one of the hub's call ports, raises
+an `ArgumentError` when the model loads, naming the model, the hub and the port. A link
+whose `port:` is not a hub module raises an `ArgumentError` naming the model.
+
 The model names only its own hub, so the crossing check passes it. The app's
 `to_prepare` block that fills the port is the one place both models are named.
 
@@ -212,6 +216,9 @@ The link is defined as soon as both the model has loaded and the port is filled,
 whichever order those happen, the same way as a `belongs_to_port` link. A boot with eager
 loading on defines it, and after a code reload in development the reloaded model lists
 the reloaded model the app fills the port with.
+
+A has-many link refuses a port that is not one of its hub's record ports, and a `port:`
+that is not a hub module, in the same way as a `belongs_to_port` link.
 
 ### The start check
 Every hub that declares a port or exposes a method is on `HubKernel::Hubs.list`. Call
