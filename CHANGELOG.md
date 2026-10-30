@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Changed
+- The crossing check reads no class names in the text of a double-quoted string in a `.rb` file, so a label such as `"Billing"` in one hub is no longer a crossing into a hub whose namespace is `Billing`. Code interpolated into the string is still read.
+
 ## [0.27.0] - 2026-10-14
 
 ### Added
