@@ -3,6 +3,9 @@ require "active_support/core_ext/string/inflections"
 
 module HubKernel
   class Crossings
+    DOUBLE_QUOTED = /"(?:[^"\\]|\\.)*"/
+    INTERPOLATED = /#\{[^}]*\}/
+
     def initialize(owners: {}, shared: [], host_layer: nil, interfaces: {}, namespaces: {}, folder_files: [])
       @owners = owners
       @folder_classes = {}
@@ -16,7 +19,8 @@ module HubKernel
 
     def in(path, source)
       hub = owner_of_file(path)
-      source.scan(/[A-Z]\w*(?:::[A-Z]\w*)*/).filter_map { |name| owned_class_in(name) }.uniq.select { |name| crossing?(name, hub) }
+      code = path.end_with?(".rb") ? without_string_text(source) : source
+      code.scan(/[A-Z]\w*(?:::[A-Z]\w*)*/).filter_map { |name| owned_class_in(name) }.uniq.select { |name| crossing?(name, hub) }
     end
 
     def read_folders(paths)
@@ -88,5 +92,7 @@ module HubKernel
     end
 
     def owner_of_view_folder(folder) = owner_of("#{folder}Controller") || owner_of(folder) || @host_layer
+
+    def without_string_text(source) = source.gsub(DOUBLE_QUOTED) { |literal| literal.scan(INTERPOLATED).join(" ") }
   end
 end

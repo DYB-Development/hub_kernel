@@ -371,6 +371,8 @@ end
 - By default the test reads every `.rb` and `.erb` file under `app/` and under each hub
   folder's `app/`, helpers and services included.
 - A constant inside another hub's class counts as naming that class.
+- In a `.rb` file, the text of a double-quoted string names no class, so a label such as
+  `"Billing"` is not a crossing. Code interpolated into the string is still read.
 - A name no hub owns, such as a namespace, is not a crossing, and neither is a class on
   the `shared` list.
 - `namespaces` gives a hub every class under a namespace, such as a hub gem's `Billing`,
