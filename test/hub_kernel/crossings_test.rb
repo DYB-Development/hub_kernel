@@ -20,6 +20,12 @@ module HubKernel
       assert_equal [ "Shop::Expense" ], crossings.in("app/models/shop/purchase.rb", "Shop::Expense::KINDS.first")
     end
 
+    test "a class name inside a double-quoted string in a Ruby file is not a crossing" do
+      crossings = HubKernel::Crossings.new(owners: OWNERS)
+
+      assert_empty crossings.in("app/models/shop/purchase.rb", %(SECTIONS = { "Shop::Expense" => %i[expenses] }))
+    end
+
     test "naming a namespace no hub owns is not a crossing" do
       crossings = HubKernel::Crossings.new(owners: OWNERS)
 
