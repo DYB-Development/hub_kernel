@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Changed
+- The crossing check also reads no class names in the text of a double-quoted string in an `.erb` view, so a section title such as `"Billing summary"` in one hub's view is no longer a crossing into a hub whose namespace is `Billing`. Code interpolated into the string is still read.
+
 ## [0.28.0] - 2026-10-29
 
 ### Changed
