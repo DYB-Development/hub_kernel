@@ -19,8 +19,7 @@ module HubKernel
 
     def in(path, source)
       hub = owner_of_file(path)
-      code = path.end_with?(".rb") ? without_string_text(source) : source
-      code.scan(/[A-Z]\w*(?:::[A-Z]\w*)*/).filter_map { |name| owned_class_in(name) }.uniq.select { |name| crossing?(name, hub) }
+      without_string_text(source).scan(/[A-Z]\w*(?:::[A-Z]\w*)*/).filter_map { |name| owned_class_in(name) }.uniq.select { |name| crossing?(name, hub) }
     end
 
     def read_folders(paths)
